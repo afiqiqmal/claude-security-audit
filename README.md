@@ -8,7 +8,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Local Output** - Report saves to `./security-audit-report.md` in your project root
 - **OWASP Top 10:2025 Coverage** - All 10 categories explicitly tested (A01-A10:2025)
 - **NIST CSF 2.0 Mapping** - Every finding maps to Govern, Identify, Protect, Detect, Respond or Recover
-- **White-Box Testing** - 15 attack categories with 500+ individual checks
+- **White-Box Testing** - 18 attack categories with 850+ individual checks
 - **AI/LLM Security** - Prompt injection, output sanitization, RAG poisoning, cost monitoring, tool calling permissions
 - **Diff Mode** - Scan only git-changed files for fast PR-level reviews
 - **Gray-Box Testing** - Role-based access probing, API endpoint testing, credential boundary checks, error differential analysis
@@ -73,7 +73,7 @@ When installed per-project, use `/project:security-audit`.
 | File | Location | Purpose |
 |------|----------|---------|
 | `security-audit.md` | `~/.claude/commands/` | `/security-audit` slash command |
-| `attack-vectors.md` | `~/.claude/security-audit-references/` | 500+ OWASP 2025/NIST-tagged security checks |
+| `attack-vectors.md` | `~/.claude/security-audit-references/` | 850+ OWASP 2025/NIST-tagged security checks |
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
 | `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 10 framework-specific checklists |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
@@ -132,6 +132,9 @@ Beyond the OWASP Top 10, the audit also checks:
 | API Security | A01:2025, A05:2025, A06:2025 |
 | Business Logic Flaws | A06:2025 |
 | AI/LLM Security | A05:2025, A01:2025, A04:2025 |
+| WebSocket Security | A01:2025, A05:2025, A07:2025 |
+| gRPC Security | A01:2025, A05:2025, A02:2025 |
+| Serverless & Cloud-Native | A01:2025, A02:2025, A03:2025 |
 | Infrastructure & DevOps | A02:2025, A03:2025, A08:2025 |
 
 ## Gray-Box Testing (6 areas)

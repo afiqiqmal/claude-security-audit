@@ -92,8 +92,11 @@ Categories in priority order (aligned with OWASP Top 10:2025):
 13. **Business Logic Flaws** [A06:2025 | PR.DS] - Race conditions, price manipulation, workflow bypass, integer overflow
 14. **Infrastructure & DevOps** [A02:2025, A03:2025, A08:2025 | PR.PS] - Dockerfile security, exposed ports, secrets in git, CI/CD injection, overly permissive IAM
 15. **AI/LLM Security** [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA] - Prompt injection (direct and indirect), PII sent to external AI APIs, AI output rendered without sanitization (XSS via LLM), tool/function calling without permission checks, RAG data poisoning, missing cost/abuse monitoring, API key leakage for AI services, fail-open when AI service is down
+16. **WebSocket Security** [A01:2025, A05:2025, A07:2025 | PR.AA, PR.DS] - Handshake auth, per-message authorization, cross-site WebSocket hijacking, broadcast isolation, message validation, connection exhaustion, backpressure
+17. **gRPC Security** [A01:2025, A05:2025, A02:2025 | PR.AA, PR.DS] - mTLS enforcement, per-RPC auth, metadata injection, message size limits, reflection disabled, streaming rate limits
+18. **Serverless and Cloud-Native** [A01:2025, A02:2025, A03:2025 | PR.PS, PR.AA] - Lambda/Functions execution role privilege, K8s RBAC and pod security, NetworkPolicies, IaC state security, admission controllers
 
-For dependency checks: `composer audit`, `npm audit`, `pip audit`.
+For dependency checks: `composer audit`, `npm audit`, `pip audit`, `bundle audit`, `govulncheck`, `dotnet list package --vulnerable`.
 For git secrets: `git log -p --all -S 'password' --since="1 year ago"`.
 
 ### Phase 3: Gray-Box Testing [NIST: PR + DE | OWASP: A01:2025, A06:2025, A07:2025]

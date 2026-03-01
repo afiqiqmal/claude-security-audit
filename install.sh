@@ -6,6 +6,35 @@
 
 set -e
 
+# Uninstall mode
+if [ "${1:-}" = "--uninstall" ]; then
+    echo ""
+    echo "Claude Security Audit Uninstaller"
+    echo "================================="
+    echo ""
+    COMMANDS_DIR="$HOME/.claude/commands"
+    REFERENCES_DIR="$HOME/.claude/security-audit-references"
+    GUIDELINES_DIR="$HOME/.claude"
+
+    REMOVED=0
+    for target in "$COMMANDS_DIR/security-audit.md" "$REFERENCES_DIR" "$GUIDELINES_DIR/security-audit-guidelines.md"; do
+        if [ -e "$target" ]; then
+            rm -rf "$target"
+            echo "  Removed $target"
+            REMOVED=$((REMOVED + 1))
+        fi
+    done
+
+    if [ $REMOVED -eq 0 ]; then
+        echo "  Nothing to remove (not installed)"
+    else
+        echo ""
+        echo "Uninstalled $REMOVED item(s). Done."
+    fi
+    echo ""
+    exit 0
+fi
+
 echo ""
 echo "Claude Security Audit Installer"
 echo "================================"
@@ -54,7 +83,10 @@ install_file() {
     if [ "$INSTALL_MODE" = "local" ]; then
         cp "$REPO_DIR/$source_path" "$dest_path"
     else
-        curl -fsSL "$REPO_URL/$source_path" -o "$dest_path" 2>/dev/null
+        if ! curl -fsSL "$REPO_URL/$source_path" -o "$dest_path"; then
+            echo -e "  ${RED}Failed to download $source_path${NC}" >&2
+            return 1
+        fi
     fi
 
     [ -f "$dest_path" ]
@@ -109,7 +141,7 @@ if [ $FRAMEWORK_FAILED -eq 0 ]; then
     echo -e "  ${GREEN}✓${NC} framework references (${FRAMEWORK_INSTALLED} frameworks)"
     INSTALLED=$((INSTALLED + 1))
 else
-    echo -e "  ${YELLOW}~${NC} framework references (${FRAMEWORK_INSTALLED}/${FRAMEWORK_INSTALLED + FRAMEWORK_FAILED})"
+    echo -e "  ${YELLOW}~${NC} framework references (${FRAMEWORK_INSTALLED}/$((FRAMEWORK_INSTALLED + FRAMEWORK_FAILED)))"
     INSTALLED=$((INSTALLED + 1))
 fi
 

@@ -35,10 +35,13 @@ Detailed checklists for each attack category. Use these as a systematic guide wh
 15. [Business Logic Flaws](#15-business-logic-flaws-a062025--prds)
 16. [Infrastructure & DevOps](#16-infrastructure--devops-a022025-a032025-a082025--prps)
 17. [AI/LLM Security](#17-aillm-security-a052025-a012025-a042025--prds-praa)
-18. [Gray-Box Testing](#18-gray-box-testing-a012025-a062025-a072025)
-19. [Security Hotspots](#19-security-hotspots-a062025--id-gv)
-20. [Code Smells](#20-code-smells-a062025--gv-pr)
-21. [Framework-Specific Checks](#21-framework-specific-checks)
+18. [WebSocket Security](#18-websocket-security-a012025-a052025-a072025--praa-prds)
+19. [gRPC Security](#19-grpc-security-a012025-a052025-a022025--praa-prds)
+20. [Serverless and Cloud-Native](#20-serverless-and-cloud-native-a012025-a022025-a032025--prps-praa)
+21. [Gray-Box Testing](#21-gray-box-testing-a012025-a062025-a072025)
+22. [Security Hotspots](#22-security-hotspots-a062025--id-gv)
+23. [Code Smells](#23-code-smells-a062025--gv-pr)
+24. [Framework-Specific Checks](#24-framework-specific-checks)
 
 ---
 
@@ -146,6 +149,13 @@ NEW in 2025. Expands the old "Vulnerable and Outdated Components" (A06:2021) to 
 - [ ] Can a compromised transitive dependency modify build output?
 - [ ] Are dependency trees reviewed for unexpected packages?
 
+### SBOM and Provenance
+- [ ] Is a Software Bill of Materials (SBOM) generated for releases (SPDX or CycloneDX)?
+- [ ] Are build artifacts attested with provenance (SLSA Level 2+)?
+- [ ] Are commits signed with verified GPG or SSH keys?
+- [ ] Is there artifact attestation linking builds to source (in-toto, Sigstore)?
+- [ ] Are SBOM reports reviewed before deployment?
+
 ---
 
 ## 4. Cryptographic Failures [A04:2025 | PR.DS]
@@ -209,6 +219,14 @@ NEW in 2025. Expands the old "Vulnerable and Outdated Components" (A06:2021) to 
 - [ ] Check for `SpEL`, `OGNL`, `MVEL` in Java projects
 - [ ] Check for `eval()` or `new Function()` in JavaScript
 
+### HTTP Request Smuggling / Desync
+- [ ] Are frontend and backend servers using the same HTTP parsing rules (Content-Length vs Transfer-Encoding)?
+- [ ] Is `Transfer-Encoding: chunked` handled consistently across proxy layers?
+- [ ] Can CL.TE or TE.CL desync attacks bypass WAF or auth checks?
+- [ ] Are HTTP/2 downgrade attacks possible (h2c smuggling)?
+- [ ] Is request body size validated at every layer (proxy, load balancer, app server)?
+- [ ] Are ambiguous requests (conflicting Content-Length and Transfer-Encoding) rejected?
+
 ---
 
 ## 6. Insecure Design [A06:2025 | GV.RM]
@@ -262,10 +280,25 @@ Covers fundamental design flaws, not implementation bugs.
 - [ ] Is there account lockout after failed attempts?
 - [ ] Are timing attacks mitigated (constant-time comparison)?
 
-### OAuth/SSO
+### OAuth 2.1 / SSO
 - [ ] Is the `state` parameter validated to prevent CSRF?
 - [ ] Are redirect URIs strictly validated (no open redirect)?
 - [ ] Is the token exchange done server-side (not in client)?
+- [ ] Is PKCE (Proof Key for Code Exchange) required for all OAuth flows?
+- [ ] Is the implicit grant flow disabled (removed in OAuth 2.1)?
+- [ ] Are authorization code lifetimes short (< 60 seconds)?
+- [ ] Is DPoP (Demonstrating Proof-of-Possession) used for sender-constrained tokens?
+- [ ] Are resource indicators (RFC 8707) validated to prevent token misuse across APIs?
+
+### Passkeys / FIDO2 / WebAuthn
+- [ ] Is credential attestation verified during registration?
+- [ ] Is the authenticator counter (sign count) validated to detect cloned credentials?
+- [ ] Is the User Verification (UV) flag enforced for sensitive operations?
+- [ ] Are backup eligibility and backup state flags handled (synced passkeys)?
+- [ ] Is passkey revocation supported (user can remove a credential)?
+- [ ] Are discoverable credentials (resident keys) properly scoped per relying party?
+- [ ] Is the relying party ID configured correctly (domain scoping)?
+- [ ] Are fallback authentication methods (backup codes) stored securely?
 
 ### Password Reset
 - [ ] Are reset tokens time-limited and single-use?
@@ -430,15 +463,26 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ## 14. API Security [A01:2025, A05:2025, A06:2025 | PR.AA]
 
+### REST API
 - [ ] Is input validation applied to all API parameters?
 - [ ] Are error responses generic (no stack traces, no DB column names)?
 - [ ] Is rate limiting applied to sensitive endpoints?
 - [ ] Is pagination enforced (no unbounded queries)?
 - [ ] Are batch/bulk endpoints limited in size?
-- [ ] Is GraphQL introspection disabled in production?
-- [ ] Are GraphQL queries depth-limited?
 - [ ] Are deprecated endpoints still accessible?
 - [ ] Is API versioning handled securely?
+- [ ] Are shadow/undocumented endpoints reachable (routes registered but not in API docs)?
+
+### GraphQL
+- [ ] Is introspection disabled in production?
+- [ ] Are queries depth-limited (preventing nested query attacks)?
+- [ ] Is query complexity/cost analysis enforced (not just depth)?
+- [ ] Are batch requests limited (query batching, alias abuse)?
+- [ ] Is field-level authorization enforced (not just type-level)?
+- [ ] Are persisted queries used (reject arbitrary query strings)?
+- [ ] Is mutation rate limiting applied separately from queries?
+- [ ] Are circular fragment references rejected?
+- [ ] Does the schema expose internal types or debugging fields?
 
 ---
 
@@ -541,7 +585,115 @@ Covers applications that integrate AI/LLM services (OpenAI, Anthropic, Google AI
 
 ---
 
-## 18. Gray-Box Testing [A01:2025, A06:2025, A07:2025]
+## 18. WebSocket Security [A01:2025, A05:2025, A07:2025 | PR.AA, PR.DS]
+
+Covers WebSocket (ws/wss) and Server-Sent Events (SSE) implementations.
+
+### Authentication and Authorization
+- [ ] Is authentication validated during the WebSocket handshake (not just on HTTP upgrade)?
+- [ ] Are authorization checks enforced per message type (not just on connection)?
+- [ ] Can unauthenticated clients establish WebSocket connections?
+- [ ] Is the `Origin` header validated to prevent cross-site WebSocket hijacking (CSWSH)?
+- [ ] Are JWT/session tokens validated on each reconnection (not cached from initial handshake)?
+- [ ] Do channel/room subscriptions enforce user permissions?
+
+### Input Validation
+- [ ] Are incoming WebSocket messages validated against an expected schema?
+- [ ] Is message size limited (preventing large payload DoS)?
+- [ ] Are binary frames validated if accepted?
+- [ ] Can malformed JSON or protocol messages crash the handler?
+- [ ] Is user input from WebSocket messages sanitized before database storage or broadcast?
+
+### Broadcast and Isolation
+- [ ] Are messages isolated per user/tenant (no cross-tenant leakage)?
+- [ ] Can a user subscribe to channels they should not access?
+- [ ] Are presence indicators (online/typing) scoped to authorized users?
+- [ ] Is message history access controlled (can new subscribers see previous messages)?
+
+### Resource Management
+- [ ] Is there a per-user connection limit (preventing connection exhaustion)?
+- [ ] Are idle connections timed out?
+- [ ] Is backpressure handled (slow client consuming server memory)?
+- [ ] Is message rate limiting enforced per connection?
+- [ ] Are reconnection storms handled (exponential backoff on client, server-side throttle)?
+
+---
+
+## 19. gRPC Security [A01:2025, A05:2025, A02:2025 | PR.AA, PR.DS]
+
+### Transport Security
+- [ ] Is TLS/mTLS enforced for all gRPC connections (not plaintext)?
+- [ ] Are client certificates validated (mutual TLS, not just server TLS)?
+- [ ] Is channel encryption configured correctly (`grpc.ssl_channel_credentials`)?
+- [ ] Are insecure channels (`grpc.insecure_channel`) used only in development?
+
+### Authentication and Authorization
+- [ ] Is per-RPC authentication enforced (interceptors/middleware)?
+- [ ] Are metadata headers validated (no injection via user-controlled metadata)?
+- [ ] Is service-to-service authentication enforced (not trusting network boundaries)?
+- [ ] Are authorization checks per method (not just per service)?
+
+### Input Validation
+- [ ] Are Protobuf message fields validated beyond type checking (ranges, lengths, formats)?
+- [ ] Are `oneof` fields handled correctly (unexpected field selection)?
+- [ ] Are unknown fields rejected or ignored safely?
+- [ ] Is maximum message size configured (`grpc.max_receive_message_length`)?
+- [ ] Are streaming RPCs rate-limited (preventing message flood)?
+
+### Service Exposure
+- [ ] Is gRPC server reflection disabled in production?
+- [ ] Are health check endpoints (`grpc.health.v1.Health`) not leaking internal state?
+- [ ] Are internal services accessible from untrusted networks?
+- [ ] Is the gRPC-Web proxy (Envoy, grpc-gateway) configured securely?
+
+### Error Handling
+- [ ] Do gRPC error responses avoid leaking internal details (status codes only, no stack traces)?
+- [ ] Are deadline/timeout values set on all RPCs?
+- [ ] Are cancelled contexts propagated correctly (preventing resource leaks)?
+- [ ] Is retry logic bounded (preventing amplification)?
+
+---
+
+## 20. Serverless and Cloud-Native [A01:2025, A02:2025, A03:2025 | PR.PS, PR.AA]
+
+### Serverless / FaaS (Lambda, Cloud Functions, Azure Functions)
+- [ ] Are execution roles following least privilege (not `*` on all resources)?
+- [ ] Are environment variables used for secrets (not hardcoded in function code)?
+- [ ] Are function URLs or API Gateway endpoints authenticated (not publicly open)?
+- [ ] Is the `/tmp` directory cleaned between invocations (no cross-invocation data leaks)?
+- [ ] Are function timeouts configured (preventing runaway executions and cost)?
+- [ ] Are cold start behaviors secure (initialization code doesn't bypass auth)?
+- [ ] Are function-to-function calls authenticated (not trusting VPC boundaries)?
+- [ ] Are event source mappings validated (SQS, SNS, S3 triggers can be spoofed)?
+- [ ] Are layers and extensions from trusted sources?
+- [ ] Is concurrency limited to prevent resource exhaustion and cost spikes?
+
+### Kubernetes
+- [ ] Are RBAC roles following least privilege (no `cluster-admin` for workloads)?
+- [ ] Are `RoleBinding` and `ClusterRoleBinding` reviewed for over-permission?
+- [ ] Are NetworkPolicies enforced (default deny, allow only required traffic)?
+- [ ] Are Pod Security Standards applied (restricted, baseline, or privileged)?
+- [ ] Are containers running as non-root with `runAsNonRoot: true`?
+- [ ] Are service account tokens auto-mounted only when needed (`automountServiceAccountToken: false`)?
+- [ ] Are Secrets encrypted at rest in etcd (`EncryptionConfiguration`)?
+- [ ] Is the Kubernetes API server not publicly accessible?
+- [ ] Are admission controllers (OPA Gatekeeper, Kyverno) enforcing policies?
+- [ ] Are kubelet API endpoints secured (not accessible without auth)?
+- [ ] Are container images pulled from trusted registries with image pull policies?
+- [ ] Is `hostPID`, `hostNetwork`, `privileged` disabled for workload pods?
+
+### Infrastructure as Code (Terraform, Pulumi, CloudFormation)
+- [ ] Is IaC state file stored securely (encrypted S3 bucket, not local)?
+- [ ] Are state file access controls enforced (not world-readable)?
+- [ ] Are secrets in IaC managed via vault references (not plaintext in templates)?
+- [ ] Are `terraform plan` / `pulumi preview` reviewed before apply?
+- [ ] Are IaC modules from trusted sources (pinned versions, verified publishers)?
+- [ ] Are drift detection and reconciliation configured?
+- [ ] Are destructive changes (`destroy`, `replace`) gated behind approval?
+
+---
+
+## 21. Gray-Box Testing [A01:2025, A06:2025, A07:2025]
 
 Checklists for testing from an authenticated user's perspective with partial system knowledge.
 
@@ -587,7 +739,7 @@ Checklists for testing from an authenticated user's perspective with partial sys
 
 ---
 
-## 19. Security Hotspots [A06:2025 | ID, GV]
+## 22. Security Hotspots [A06:2025 | ID, GV]
 
 Flag sensitive code matching these patterns:
 
@@ -628,7 +780,7 @@ Flag sensitive code matching these patterns:
 
 ---
 
-## 20. Code Smells [A06:2025 | GV, PR]
+## 23. Code Smells [A06:2025 | GV, PR]
 
 ### Architecture
 - [ ] Controllers over 500 lines (authorization inconsistency)
@@ -671,7 +823,7 @@ Flag sensitive code matching these patterns:
 
 ---
 
-## 21. Framework-Specific Checks
+## 24. Framework-Specific Checks
 
 Framework checklists are in dedicated files under `references/frameworks/` (or `~/.claude/security-audit-references/frameworks/` when installed globally).
 

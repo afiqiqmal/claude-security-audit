@@ -193,6 +193,48 @@ This reference maps audit findings to both NIST CSF 2.0 and OWASP Top 10:2025.
 
 ---
 
+## WebSocket, gRPC and Serverless Finding Mapping
+
+| Finding Type | OWASP | NIST Primary | NIST Secondary |
+|-------------|-------|-------------|---------------|
+| WebSocket handshake auth missing | A07:2025 | PR.AA | PR.DS |
+| Cross-site WebSocket hijacking | A01:2025 | PR.AA | PR.DS |
+| WebSocket message injection | A05:2025 | PR.DS | PR.AA |
+| WebSocket broadcast leakage | A01:2025 | PR.AA | PR.DS |
+| WebSocket connection exhaustion | A06:2025 | PR.IR | DE.CM |
+| gRPC plaintext channel in prod | A04:2025 | PR.DS | PR.PS |
+| gRPC reflection enabled in prod | A02:2025 | PR.PS | ID.AM |
+| gRPC metadata injection | A05:2025 | PR.DS | PR.AA |
+| gRPC missing per-RPC auth | A01:2025 | PR.AA | GV.RR |
+| Serverless over-privileged execution role | A01:2025 | PR.AA | GV.RM |
+| Serverless env var secret exposure | A04:2025 | PR.DS | PR.PS |
+| K8s RBAC over-permission | A01:2025 | PR.AA | GV.RR |
+| K8s NetworkPolicy missing | A02:2025 | PR.PS | PR.IR |
+| K8s secrets unencrypted in etcd | A04:2025 | PR.DS | PR.PS |
+| K8s privileged container | A01:2025 | PR.AA | PR.PS |
+| IaC state file exposed | A04:2025 | PR.DS | PR.PS |
+| IaC secrets in plaintext | A04:2025 | PR.DS | GV.PO |
+| HTTP request smuggling | A05:2025 | PR.DS | PR.PS |
+| SBOM not generated | A03:2025 | GV.SC | ID.AM |
+| Build provenance missing (SLSA) | A08:2025 | GV.SC | PR.DS |
+
+---
+
+## OAuth 2.1, Passkeys and FIDO2 Finding Mapping
+
+| Finding Type | OWASP | NIST Primary | NIST Secondary |
+|-------------|-------|-------------|---------------|
+| PKCE not enforced | A07:2025 | PR.AA | PR.DS |
+| Implicit grant flow enabled | A07:2025 | PR.AA | GV.PO |
+| Auth code lifetime too long | A07:2025 | PR.AA | PR.DS |
+| DPoP not used for token binding | A07:2025 | PR.AA | PR.DS |
+| WebAuthn attestation not verified | A07:2025 | PR.AA | PR.DS |
+| Authenticator counter not validated | A07:2025 | PR.AA | DE.CM |
+| Passkey revocation not supported | A07:2025 | PR.AA | RS.MI |
+| Backup codes stored insecurely | A04:2025 | PR.DS | PR.AA |
+
+---
+
 ## AI/LLM Security Finding Mapping
 
 | Finding Type | OWASP | NIST Primary | NIST Secondary |
