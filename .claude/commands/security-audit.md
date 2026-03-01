@@ -48,6 +48,8 @@ Tag every finding with both:
 
 Read `~/.claude/security-audit-references/nist-csf-mapping.md` for the full mapping table if available.
 
+For framework-specific checks, read the matching file from `~/.claude/security-audit-references/frameworks/` based on the detected framework (e.g., `frameworks/laravel.md`, `frameworks/nextjs.md`).
+
 ## Audit Workflow
 
 ### Phase 0: Diff Scoping (diff mode only)

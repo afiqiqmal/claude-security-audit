@@ -92,6 +92,27 @@ else
     FAILED=$((FAILED + 1))
 fi
 
+# Install framework reference files
+FRAMEWORKS="laravel nextjs fastapi express django rails spring-boot aspnet-core go flask"
+FRAMEWORK_FAILED=0
+FRAMEWORK_INSTALLED=0
+
+for fw in $FRAMEWORKS; do
+    if install_file "references/frameworks/${fw}.md" "$REFERENCES_DIR/frameworks/${fw}.md"; then
+        FRAMEWORK_INSTALLED=$((FRAMEWORK_INSTALLED + 1))
+    else
+        FRAMEWORK_FAILED=$((FRAMEWORK_FAILED + 1))
+    fi
+done
+
+if [ $FRAMEWORK_FAILED -eq 0 ]; then
+    echo -e "  ${GREEN}✓${NC} framework references (${FRAMEWORK_INSTALLED} frameworks)"
+    INSTALLED=$((INSTALLED + 1))
+else
+    echo -e "  ${YELLOW}~${NC} framework references (${FRAMEWORK_INSTALLED}/${FRAMEWORK_INSTALLED + FRAMEWORK_FAILED})"
+    INSTALLED=$((INSTALLED + 1))
+fi
+
 # Install guidelines
 if install_file "security-audit-guidelines.md" "$GUIDELINES_DIR/security-audit-guidelines.md"; then
     echo -e "  ${GREEN}✓${NC} security-audit-guidelines.md"
@@ -120,6 +141,8 @@ echo "Usage in Claude Code:"
 echo ""
 echo "  /security-audit              Full audit (all categories)"
 echo "  /security-audit quick        Critical and high issues only"
+echo "  /security-audit diff         Scan only changed files (PR review)"
+echo "  /security-audit diff:main    Scan changes compared to main branch"
 echo "  /security-audit focus:auth   Authentication and authorization deep dive"
 echo "  /security-audit focus:api    API security deep dive"
 echo "  /security-audit focus:config Configuration and infrastructure deep dive"

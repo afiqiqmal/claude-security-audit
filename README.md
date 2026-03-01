@@ -26,7 +26,18 @@ claude-security-audit/
 │       └── security-audit.md       # /security-audit slash command
 ├── references/
 │   ├── attack-vectors.md           # 500+ security checks (OWASP 2025 + NIST tagged)
-│   └── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
+│   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
+│   └── frameworks/                 # Framework-specific checklists
+│       ├── laravel.md
+│       ├── nextjs.md
+│       ├── fastapi.md
+│       ├── express.md
+│       ├── django.md
+│       ├── rails.md
+│       ├── spring-boot.md
+│       ├── aspnet-core.md
+│       ├── go.md
+│       └── flask.md
 ├── security-audit-guidelines.md    # Severity ratings, conventions, framework detection
 ├── install.sh                      # One-command installer
 ├── CLAUDE.md                       # Project context for Claude Code
@@ -64,6 +75,7 @@ When installed per-project, use `/project:security-audit`.
 | `security-audit.md` | `~/.claude/commands/` | `/security-audit` slash command |
 | `attack-vectors.md` | `~/.claude/security-audit-references/` | 500+ OWASP 2025/NIST-tagged security checks |
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
+| `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 10 framework-specific checklists |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
 
 ## Usage
