@@ -75,6 +75,11 @@ Global security audit standards for Claude Code projects. Defines the methodolog
 | `requirements.txt` + `manage.py` | Django | `DEBUG=True`, raw SQL, pickle deserialization, CSRF exemptions |
 | `package.json` + `express` | Express | Prototype pollution, NoSQL injection, helmet, `eval()`, unhandled rejections |
 | `requirements.txt` + `fastapi` | FastAPI | Pydantic bypass, SSTI, `subprocess(shell=True)`, CORS, exception handlers |
+| `Gemfile` + `config/routes.rb` | Ruby on Rails | `html_safe`, raw SQL, mass assignment, `protect_from_forgery`, strong params |
+| `pom.xml` or `build.gradle` + `@SpringBootApplication` | Spring Boot | Actuator endpoints, SpEL injection, deserialization, CSRF config |
+| `*.csproj` + `Program.cs` | ASP.NET Core | Anti-forgery, `FromSqlRaw`, Data Protection API, Kestrel config |
+| `go.mod` + `gin` or `echo` or `fiber` | Go (Gin/Echo/Fiber) | `text/template` vs `html/template`, `os/exec`, SQL string concat, panic recovery |
+| `requirements.txt` + `flask` | Flask | Jinja2 `\| safe`, `SECRET_KEY`, CSRF (Flask-WTF), debug mode, `pickle.loads()` |
 
 ## Output Location
 

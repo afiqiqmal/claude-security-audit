@@ -8,11 +8,13 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Local Output** - Report saves to `./security-audit-report.md` in your project root
 - **OWASP Top 10:2025 Coverage** - All 10 categories explicitly tested (A01-A10:2025)
 - **NIST CSF 2.0 Mapping** - Every finding maps to Govern, Identify, Protect, Detect, Respond or Recover
-- **White-Box Testing** - 14 attack categories with 200+ individual checks
+- **White-Box Testing** - 15 attack categories with 500+ individual checks
+- **AI/LLM Security** - Prompt injection, output sanitization, RAG poisoning, cost monitoring, tool calling permissions
+- **Diff Mode** - Scan only git-changed files for fast PR-level reviews
 - **Gray-Box Testing** - Role-based access probing, API endpoint testing, credential boundary checks, error differential analysis
 - **Security Hotspots** - Flags sensitive code that needs careful review during PRs
 - **Code Smells** - Quality patterns that breed security bugs
-- **Framework Detection** - Tailored checks for Laravel, Next.js, FastAPI, Express and Django
+- **Framework Detection** - Tailored checks for Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go and Flask
 - **Multiple Modes** - Full audit, quick scan, gray-box only, or focused deep dives
 
 ## What's Included
@@ -23,7 +25,7 @@ claude-security-audit/
 │   └── commands/
 │       └── security-audit.md       # /security-audit slash command
 ├── references/
-│   ├── attack-vectors.md           # 200+ security checks (OWASP 2025 + NIST tagged)
+│   ├── attack-vectors.md           # 500+ security checks (OWASP 2025 + NIST tagged)
 │   └── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
 ├── security-audit-guidelines.md    # Severity ratings, conventions, framework detection
 ├── install.sh                      # One-command installer
@@ -60,7 +62,7 @@ When installed per-project, use `/project:security-audit`.
 | File | Location | Purpose |
 |------|----------|---------|
 | `security-audit.md` | `~/.claude/commands/` | `/security-audit` slash command |
-| `attack-vectors.md` | `~/.claude/security-audit-references/` | 200+ OWASP 2025/NIST-tagged security checks |
+| `attack-vectors.md` | `~/.claude/security-audit-references/` | 500+ OWASP 2025/NIST-tagged security checks |
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
 
@@ -75,6 +77,11 @@ When installed per-project, use `/project:security-audit`.
 
 # Gray-box testing only
 /security-audit gray
+
+# Diff mode - scan only changed files (fast PR reviews)
+/security-audit diff           # Changes since last commit
+/security-audit diff:main      # Changes compared to main branch
+/security-audit diff:develop   # Changes compared to develop branch
 
 # Focused deep dives
 /security-audit focus:auth     # Authentication and authorization
@@ -112,6 +119,7 @@ Beyond the OWASP Top 10, the audit also checks:
 | File Upload & Storage | A01:2025, A06:2025 |
 | API Security | A01:2025, A05:2025, A06:2025 |
 | Business Logic Flaws | A06:2025 |
+| AI/LLM Security | A05:2025, A01:2025, A04:2025 |
 | Infrastructure & DevOps | A02:2025, A03:2025, A08:2025 |
 
 ## Gray-Box Testing (6 areas)

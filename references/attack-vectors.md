@@ -34,10 +34,11 @@ Detailed checklists for each attack category. Use these as a systematic guide wh
 14. [API Security](#14-api-security-a012025-a052025-a062025--praa)
 15. [Business Logic Flaws](#15-business-logic-flaws-a062025--prds)
 16. [Infrastructure & DevOps](#16-infrastructure--devops-a022025-a032025-a082025--prps)
-17. [Gray-Box Testing](#17-gray-box-testing-a012025-a062025-a072025)
-18. [Security Hotspots](#18-security-hotspots-a062025--id-gv)
-19. [Code Smells](#19-code-smells-a062025--gv-pr)
-20. [Framework-Specific Checks](#20-framework-specific-checks)
+17. [AI/LLM Security](#17-aillm-security-a052025-a012025-a042025--prds-praa)
+18. [Gray-Box Testing](#18-gray-box-testing-a012025-a062025-a072025)
+19. [Security Hotspots](#19-security-hotspots-a062025--id-gv)
+20. [Code Smells](#20-code-smells-a062025--gv-pr)
+21. [Framework-Specific Checks](#21-framework-specific-checks)
 
 ---
 
@@ -473,7 +474,74 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 17. Gray-Box Testing [A01:2025, A06:2025, A07:2025]
+## 17. AI/LLM Security [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA]
+
+Covers applications that integrate AI/LLM services (OpenAI, Anthropic, Google AI, Cohere, local models via Ollama/vLLM). Aligned with OWASP Top 10 for LLM Applications 2025.
+
+### Prompt Injection [A05:2025 | PR.DS]
+- [ ] Can user input override or escape the system prompt (direct injection)?
+- [ ] Can retrieved data (RAG context, tool results, emails, documents) inject instructions (indirect injection)?
+- [ ] Are system prompts concatenated with user input via string interpolation (not parameterized)?
+- [ ] Is there input filtering or classification before prompts reach the model?
+- [ ] Can users extract the system prompt through adversarial queries?
+- [ ] Are multi-turn conversations validated (can earlier turns poison later context)?
+- [ ] Do structured output modes (JSON mode, tool calling) prevent injection in schema fields?
+
+### Sensitive Data in Prompts [A04:2025 | PR.DS]
+- [ ] Is PII (names, emails, SSNs, health data) sent to external AI APIs without redaction?
+- [ ] Are API keys for AI services (OpenAI, Anthropic, Google) hardcoded or in client bundles?
+- [ ] Is conversation history stored unencrypted?
+- [ ] Are model responses cached with sensitive data included?
+- [ ] Do system prompts contain API keys, database credentials or internal URLs?
+- [ ] Is fine-tuning or training data reviewed for secrets and PII?
+- [ ] Are AI provider data retention policies reviewed (does the provider train on your data)?
+
+### Output Handling [A05:2025 | PR.DS]
+- [ ] Is AI-generated content rendered as HTML without sanitization (XSS via LLM)?
+- [ ] Is AI-generated SQL or code executed without validation?
+- [ ] Are AI-generated URLs or links rendered without validation?
+- [ ] Is markdown from AI output rendered unsanitized (markdown injection)?
+- [ ] Are AI-generated file paths used in file system operations without sanitization?
+- [ ] Do AI responses get interpolated into shell commands?
+- [ ] Are tool/function call arguments from the model validated before execution?
+
+### Access Control for AI Features [A01:2025 | PR.AA]
+- [ ] Are AI tools and function calls gated by user role and permissions?
+- [ ] Can all users invoke expensive AI operations (no role-based access)?
+- [ ] Does RAG retrieve documents the current user is not authorized to see?
+- [ ] Is there rate limiting on AI endpoints (both for cost and abuse)?
+- [ ] Are AI features isolated per tenant (shared context between tenants)?
+- [ ] Can users access other users' conversation history or AI-generated content?
+- [ ] Are admin-only AI tools (data analysis, bulk operations) properly restricted?
+
+### Data Integrity and Poisoning [A08:2025 | PR.DS, GV.SC]
+- [ ] Can users inject content into the RAG knowledge base or vector store?
+- [ ] Are embedding sources validated and from trusted origins?
+- [ ] Is fine-tuning data validated before training?
+- [ ] Are model versions pinned (not auto-updated to potentially compromised versions)?
+- [ ] Are vector database access controls enforced (who can write embeddings)?
+- [ ] Can adversarial documents in the corpus influence model outputs for other users?
+
+### Logging and Cost Monitoring [A09:2025 | DE.CM]
+- [ ] Are AI interactions logged (prompt, response, model, tokens used)?
+- [ ] Is there cost monitoring and alerting for AI API spend?
+- [ ] Are prompt injection attempts detected and logged?
+- [ ] Is token usage tracked per user for abuse detection?
+- [ ] Are AI-related errors (timeouts, rate limits, content filters) logged?
+- [ ] Is there alerting on unusual AI usage patterns (sudden spikes, bulk extraction)?
+
+### Error Handling for AI Services [A10:2025 | DE.AE]
+- [ ] What happens when the AI service times out (does the request hang indefinitely)?
+- [ ] Does the application fail open when the AI service is down (unfiltered content, bypassed checks)?
+- [ ] Is token/context limit exceeded handled gracefully?
+- [ ] Are AI provider rate limits (429 responses) handled with backoff?
+- [ ] Do malformed AI responses (invalid JSON, unexpected format) crash the application?
+- [ ] Are content filter rejections (model refuses to answer) handled in the UX?
+- [ ] Is there a fallback when the AI model returns empty or null responses?
+
+---
+
+## 18. Gray-Box Testing [A01:2025, A06:2025, A07:2025]
 
 Checklists for testing from an authenticated user's perspective with partial system knowledge.
 
@@ -519,7 +587,7 @@ Checklists for testing from an authenticated user's perspective with partial sys
 
 ---
 
-## 18. Security Hotspots [A06:2025 | ID, GV]
+## 19. Security Hotspots [A06:2025 | ID, GV]
 
 Flag sensitive code matching these patterns:
 
@@ -560,7 +628,7 @@ Flag sensitive code matching these patterns:
 
 ---
 
-## 19. Code Smells [A06:2025 | GV, PR]
+## 20. Code Smells [A06:2025 | GV, PR]
 
 ### Architecture
 - [ ] Controllers over 500 lines (authorization inconsistency)
@@ -603,7 +671,7 @@ Flag sensitive code matching these patterns:
 
 ---
 
-## 20. Framework-Specific Checks
+## 21. Framework-Specific Checks
 
 ### Laravel [A01-A10:2025]
 - [ ] `APP_DEBUG=false` in production [A02:2025]
@@ -663,3 +731,95 @@ Flag sensitive code matching these patterns:
 - [ ] Audit logging on auth events [A09:2025]
 - [ ] Unhandled promise rejections caught [A10:2025]
 - [ ] `npm audit` shows no critical CVEs [A03:2025]
+
+### Ruby on Rails [A01-A10:2025]
+- [ ] `config.force_ssl = true` in production [A02:2025]
+- [ ] `protect_from_forgery with: :exception` in ApplicationController [A01:2025]
+- [ ] Strong parameters used (`params.require().permit()`) on all controllers [A01:2025]
+- [ ] No `html_safe`, `raw()` or `sanitize` bypass on user input in views [A05:2025]
+- [ ] `SECRET_KEY_BASE` set and not committed to source [A04:2025]
+- [ ] `config.consider_all_requests_local = false` in production [A02:2025]
+- [ ] No raw SQL via `find_by_sql`, `execute` or `where("col = '#{input}'")` [A05:2025]
+- [ ] No `render inline:` with user-controlled content [A05:2025]
+- [ ] Devise or `has_secure_password` configured with strong defaults [A07:2025]
+- [ ] Session store is server-side for sensitive apps (not cookie-only) [A07:2025]
+- [ ] Rack::Attack or similar rate limiting configured [A07:2025]
+- [ ] `config.filter_parameters` includes passwords, tokens and secrets [A09:2025]
+- [ ] Active Record callbacks don't bypass authorization checks [A01:2025]
+- [ ] ActiveJob payloads don't serialize sensitive user objects [A08:2025]
+- [ ] Content Security Policy configured via `content_security_policy` [A02:2025]
+- [ ] `bundle audit` shows no critical CVEs [A03:2025]
+- [ ] `Gemfile.lock` committed [A03:2025]
+
+### Spring Boot / Java [A01-A10:2025]
+- [ ] Spring Security configured and not disabled via `@EnableWebSecurity` overrides [A07:2025]
+- [ ] CSRF protection enabled for web endpoints (not disabled globally) [A01:2025]
+- [ ] Actuator endpoints not publicly accessible (`/actuator`, `/env`, `/beans`, `/heapdump`) [A02:2025]
+- [ ] No SpEL (Spring Expression Language) injection via user input [A05:2025]
+- [ ] All SQL uses prepared statements or JPA parameterized queries (no string concatenation) [A05:2025]
+- [ ] `@Valid` or `@Validated` annotations on all request body DTOs [A05:2025]
+- [ ] No `ObjectInputStream.readObject()` on untrusted data [A08:2025]
+- [ ] No `Runtime.exec()` or `ProcessBuilder` with user-controlled arguments [A05:2025]
+- [ ] Security headers configured (Spring Security defaults or custom) [A02:2025]
+- [ ] `application.properties` / `application.yml` secrets externalized (not in source) [A04:2025]
+- [ ] Production profile disables debug endpoints and verbose errors [A02:2025]
+- [ ] Method-level security (`@PreAuthorize`, `@Secured`, `@RolesAllowed`) used consistently [A01:2025]
+- [ ] Jackson deserialization: `DefaultTyping` disabled or restricted [A08:2025]
+- [ ] Custom error pages configured (no Whitelabel Error Page in production) [A10:2025]
+- [ ] CORS configured restrictively (not `allowedOrigins("*")` with credentials) [A02:2025]
+- [ ] Logging with SLF4J/Logback, sensitive fields masked in MDC [A09:2025]
+- [ ] `mvn dependency-check:check` or `gradle dependencyCheckAnalyze` shows no critical CVEs [A03:2025]
+
+### ASP.NET Core [A01-A10:2025]
+- [ ] `[ValidateAntiForgeryToken]` or auto-validation on all POST/PUT/DELETE actions [A01:2025]
+- [ ] `[Authorize]` attribute with policies on all protected endpoints [A01:2025]
+- [ ] Data Protection API used for encrypting sensitive data at rest [A04:2025]
+- [ ] `ASPNETCORE_ENVIRONMENT` set to `Production` (not `Development`) in prod [A02:2025]
+- [ ] Connection strings and secrets in User Secrets, Key Vault or environment vars (not `appsettings.json`) [A04:2025]
+- [ ] Input validation with Data Annotations or FluentValidation on all models [A05:2025]
+- [ ] No `FromSqlRaw` with string interpolation (use `FromSqlInterpolated` or parameterized) [A05:2025]
+- [ ] CORS policy restrictive (not `AllowAnyOrigin().AllowCredentials()`) [A02:2025]
+- [ ] HSTS, CSP and security headers via middleware [A02:2025]
+- [ ] ASP.NET Core Identity configured with strong password rules [A07:2025]
+- [ ] Rate limiting via `Microsoft.AspNetCore.RateLimiting` middleware [A07:2025]
+- [ ] Exception handling middleware returns generic errors in production [A10:2025]
+- [ ] No `Process.Start()` with user-controlled arguments [A05:2025]
+- [ ] SignalR hubs enforce authorization [A01:2025]
+- [ ] Logging with Serilog/NLog, sensitive data destructured or masked [A09:2025]
+- [ ] `dotnet list package --vulnerable` shows no critical CVEs [A03:2025]
+
+### Go (Gin / Echo / Fiber) [A01-A10:2025]
+- [ ] SQL queries use parameterized statements (`db.Query(sql, args...)` or `sqlx`) [A05:2025]
+- [ ] No `fmt.Sprintf` or string concatenation for SQL query construction [A05:2025]
+- [ ] Input validation with `go-playground/validator` tags or equivalent [A05:2025]
+- [ ] CORS middleware configured restrictively (not `AllowAllOrigins`) [A02:2025]
+- [ ] No `os/exec.Command` with user-controlled arguments without sanitization [A05:2025]
+- [ ] Templates use `html/template` (auto-escaping), not `text/template` for web output [A05:2025]
+- [ ] JWT validation checks signature, expiry, issuer and audience [A07:2025]
+- [ ] Rate limiting middleware applied to auth and sensitive endpoints [A07:2025]
+- [ ] Panic recovery middleware installed (`gin.Recovery()`, `echo.Recover()`) [A10:2025]
+- [ ] Error responses return generic messages, not stack traces or internal details [A10:2025]
+- [ ] File path handling uses `filepath.Clean()` and validates against traversal [A01:2025]
+- [ ] Context timeouts (`context.WithTimeout`) on all external HTTP calls and DB queries [A10:2025]
+- [ ] TLS configured for production (not plain HTTP) [A04:2025]
+- [ ] Structured logging (`slog`, `zerolog`, `zap`) without sensitive fields [A09:2025]
+- [ ] `govulncheck ./...` shows no critical vulnerabilities [A03:2025]
+- [ ] `go.sum` committed [A03:2025]
+
+### Flask [A01-A10:2025]
+- [ ] `DEBUG = False` and `TESTING = False` in production config [A02:2025]
+- [ ] `SECRET_KEY` is strong, random and not hardcoded in source [A04:2025]
+- [ ] CSRF protection via Flask-WTF (`CSRFProtect(app)`) [A01:2025]
+- [ ] Jinja2 `autoescape=True` (default in Flask, verify not overridden) [A05:2025]
+- [ ] No `| safe` filter on user-controlled content in templates [A05:2025]
+- [ ] No `eval()`, `exec()`, `pickle.loads()` or `yaml.load()` with user data [A05:2025, A08:2025]
+- [ ] SQLAlchemy uses parameterized queries (no `text()` with f-strings or `.format()`) [A05:2025]
+- [ ] File uploads validate MIME type, size and sanitize filename (`werkzeug.utils.secure_filename`) [A01:2025]
+- [ ] Session cookie has `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_HTTPONLY`, `SESSION_COOKIE_SAMESITE` [A07:2025]
+- [ ] Flask-Login or Flask-Security configured with session timeout [A07:2025]
+- [ ] Rate limiting via Flask-Limiter on auth and sensitive endpoints [A07:2025]
+- [ ] CORS configured via Flask-CORS (not `origins="*"` with `supports_credentials=True`) [A02:2025]
+- [ ] Error handlers (`@app.errorhandler`) return generic messages in production [A10:2025]
+- [ ] Logging configured without sensitive data (`password`, `token`, `secret`) [A09:2025]
+- [ ] `pip-audit` or `safety check` shows no critical CVEs [A03:2025]
+- [ ] `requirements.txt` has pinned versions or `Pipfile.lock` / `poetry.lock` committed [A03:2025]

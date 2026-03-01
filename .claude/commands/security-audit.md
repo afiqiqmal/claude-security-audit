@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*)
 description: Run a comprehensive white-box and gray-box security audit on the current project with OWASP Top 10:2025 and NIST CSF 2.0 mapping, security hotspots, code smells and actionable remediation. Outputs report to project directory.
-argument-hint: "[full|quick|gray|focus:auth|focus:api|focus:config]"
+argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config]"
 ---
 
 # Security Audit Command
@@ -16,6 +16,8 @@ Based on `$ARGUMENTS`:
 - **gray** - Gray-box testing only (role-based access, API probing, credential boundaries)
 - **focus:auth** - Deep dive on authentication and authorization
 - **focus:api** - Deep dive on API security, input validation and rate limiting
+- **diff** - Scan only files changed since last commit (`git diff HEAD`), skip gray-box and smells
+- **diff:BRANCH** - Scan only files changed compared to a branch (e.g., `diff:main`), skip gray-box and smells
 - **focus:config** - Deep dive on configuration, supply chain and infrastructure
 
 ## Framework Mapping
@@ -48,6 +50,16 @@ Read `~/.claude/security-audit-references/nist-csf-mapping.md` for the full mapp
 
 ## Audit Workflow
 
+### Phase 0: Diff Scoping (diff mode only)
+
+If `$ARGUMENTS` starts with `diff`:
+1. If `diff:BRANCH` - run `git diff BRANCH...HEAD --name-only` to get changed files
+2. If `diff` (no branch) - run `git diff HEAD --name-only` for uncommitted changes, plus `git diff HEAD~1 --name-only` for the last commit
+3. Store the list of changed files - all subsequent phases scan ONLY these files
+4. Skip Phase 3 (gray-box) and Phase 5 (code smells) - they are not useful at diff scope
+5. Still run Phase 4 (hotspots) on changed files - this is valuable for PR review
+6. In the report, note which files were scanned and the diff reference used
+
 ### Phase 1: Reconnaissance [NIST: ID | OWASP: all]
 
 1. Map the project structure - list all directories, identify frameworks and languages
@@ -77,6 +89,7 @@ Categories in priority order (aligned with OWASP Top 10:2025):
 12. **API Security** [A01:2025, A05:2025, A06:2025 | PR.AA] - Rate limiting, validation, error verbosity, broken object-level auth, excessive data exposure
 13. **Business Logic Flaws** [A06:2025 | PR.DS] - Race conditions, price manipulation, workflow bypass, integer overflow
 14. **Infrastructure & DevOps** [A02:2025, A03:2025, A08:2025 | PR.PS] - Dockerfile security, exposed ports, secrets in git, CI/CD injection, overly permissive IAM
+15. **AI/LLM Security** [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA] - Prompt injection (direct and indirect), PII sent to external AI APIs, AI output rendered without sanitization (XSS via LLM), tool/function calling without permission checks, RAG data poisoning, missing cost/abuse monitoring, API key leakage for AI services, fail-open when AI service is down
 
 For dependency checks: `composer audit`, `npm audit`, `pip audit`.
 For git secrets: `git log -p --all -S 'password' --since="1 year ago"`.
@@ -149,6 +162,7 @@ Flag sensitive code areas that are not vulnerable today but would break if modif
 - Third-party integrations [GV.SC | A03:2025, A08:2025]
 - Security configuration [PR.PS | A02:2025]
 - Error handling and failure modes [DE.AE | A09:2025, A10:2025]
+- AI/LLM integration points [PR.DS | A05:2025, A01:2025] - prompt construction, output rendering, tool calling, RAG retrieval boundaries
 
 ### Phase 5: Code Smells [NIST: GV + PR | OWASP: A06:2025]
 

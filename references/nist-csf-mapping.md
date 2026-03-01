@@ -193,6 +193,30 @@ This reference maps audit findings to both NIST CSF 2.0 and OWASP Top 10:2025.
 
 ---
 
+## AI/LLM Security Finding Mapping
+
+| Finding Type | OWASP | NIST Primary | NIST Secondary |
+|-------------|-------|-------------|---------------|
+| Direct prompt injection | A05:2025 | PR.DS | DE.CM |
+| Indirect prompt injection (RAG) | A05:2025 | PR.DS | GV.SC |
+| PII sent to external AI APIs | A04:2025 | PR.DS | GV.PO |
+| AI API keys hardcoded or exposed | A04:2025 | PR.DS | ID.AM |
+| AI output rendered as unsanitized HTML | A05:2025 | PR.DS | PR.PS |
+| AI-generated code/SQL executed unvalidated | A05:2025 | PR.DS | PR.PS |
+| Tool/function calling without auth checks | A01:2025 | PR.AA | GV.RR |
+| RAG retrieving unauthorized documents | A01:2025 | PR.AA | PR.DS |
+| RAG data source poisoning | A08:2025 | PR.DS | GV.SC |
+| No rate limiting on AI endpoints | A06:2025 | PR.AA | DE.CM |
+| AI cost monitoring absent | A06:2025 | DE.CM | GV.RM |
+| AI interactions not logged | A09:2025 | DE.CM | GV.OV |
+| Prompt injection attempts not detected | A09:2025 | DE.AE | DE.CM |
+| AI service timeout unhandled | A10:2025 | DE.AE | PR.IR |
+| Fail-open when AI service is down | A10:2025 | DE.AE | PR.AA |
+| Model version not pinned | A03:2025 | GV.SC | ID.RA |
+| Shared AI context between tenants | A01:2025 | PR.AA | PR.DS |
+
+---
+
 ## Gray-Box Finding Mapping
 
 | Finding Type | OWASP | NIST Primary | NIST Secondary |
