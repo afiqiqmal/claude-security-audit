@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*)
 description: Run a comprehensive white-box and gray-box security audit with OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping. Shows findings by default. Append --fix to include remediation code blocks.
-argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config|phase:1|phase:2|phase:3|phase:4|phase:5] [--fix]"
+argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config|phase:1|phase:2|phase:3|phase:4|phase:5] [--fix] [--lite]"
 ---
 
 # Security Audit Command
@@ -31,7 +31,15 @@ Phase mode always runs Phase 1 (reconnaissance) first to gather context, then ex
 
 Append `--fix` to any mode to include copy-paste-ready code fixes in the report. Without `--fix`, the report shows only findings (vulnerable code, location, impact) and no remediation code blocks.
 
-Examples: `/security-audit --fix`, `/security-audit quick --fix`, `/security-audit diff:main --fix`
+### Lite Mode
+
+Append `--lite` to any mode to reduce token usage. Lite mode:
+- Tags findings with **OWASP + CWE + NIST only** (skips SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001)
+- Does NOT read `compliance-mapping.md` or `nist-csf-mapping.md`
+- Omits the Compliance Coverage table from the report
+- Uses inline category summaries instead of reading `attack-vectors.md` for `quick` mode
+
+Combine flags freely: `/security-audit quick --lite`, `/security-audit diff:main --lite --fix`
 
 ## Framework Mapping
 
@@ -61,11 +69,11 @@ Tag every finding with all applicable frameworks:
 
 ### CWE (Common Weakness Enumeration)
 
-Tag each finding with the most specific CWE ID (e.g., CWE-89 for SQL injection, CWE-79 for XSS). Use the compliance mapping reference for the full list.
+Tag each finding with the most specific CWE ID (e.g., CWE-89 for SQL injection, CWE-79 for XSS).
 
-### Additional Compliance Frameworks
+### Additional Compliance Frameworks (skip if `--lite`)
 
-When relevant, also tag findings with:
+When `--lite` is NOT set, also tag findings with:
 - **SANS/CWE Top 25** - Note if the finding matches a Top 25 entry (e.g., "SANS Top 25 #3")
 - **OWASP ASVS 4.0** - Reference the ASVS chapter and requirement (e.g., "ASVS V5.3.4")
 - **PCI DSS 4.0** - Reference the requirement (e.g., "PCI DSS 6.2.4") - especially for apps handling payment data
@@ -73,11 +81,19 @@ When relevant, also tag findings with:
 - **SOC 2** - Reference the Trust Service Criteria (e.g., "CC6.1") - for SaaS compliance
 - **ISO 27001:2022** - Reference the Annex A control (e.g., "A.8.28") - for ISO-certified organizations
 
-Read `~/.claude/security-audit-references/nist-csf-mapping.md` for the full NIST mapping table if available.
+## Reference Loading
 
-Read `~/.claude/security-audit-references/compliance-mapping.md` for the full cross-framework mapping (CWE, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2, ISO 27001) if available.
+Load reference files **conditionally** to minimize token usage. Do NOT read files that are not needed for the current mode.
 
-For framework-specific checks, read the matching file from `~/.claude/security-audit-references/frameworks/` based on the detected framework (e.g., `frameworks/laravel.md`, `frameworks/nextjs.md`).
+| Reference File | When to Read |
+|---------------|-------------|
+| `attack-vectors.md` | `full`, `diff`, `phase:2` modes. Skip for `quick` (use inline summaries above). For `focus` modes, read only the relevant sections. |
+| `nist-csf-mapping.md` | `full` and `phase:2` modes only. Skip if `--lite`. |
+| `compliance-mapping.md` | `full` mode only. Skip if `--lite`. Not needed for `quick`, `diff`, `focus` or `phase` modes. |
+| `frameworks/*.md` | Read only the matching framework file after detecting the tech stack in Phase 1. Read at most one file. |
+| Custom check `.md` files | Read during Phase 1 if the folders exist. |
+
+All reference files are in `~/.claude/security-audit-references/`.
 
 For custom checks, read all `.md` files from these folders if they exist:
 1. `~/.claude/security-audit-custom/` (global custom checks, apply to all projects)
@@ -107,7 +123,9 @@ If `$ARGUMENTS` starts with `diff`:
 
 ### Phase 2: White-Box Attack Surface Analysis [NIST: ID + PR]
 
-Read `~/.claude/security-audit-references/attack-vectors.md` for the full checklist if available.
+For `full`, `diff` and `phase:2` modes: read `~/.claude/security-audit-references/attack-vectors.md` for the detailed checklist.
+For `focus` modes: read only the relevant sections of `attack-vectors.md` (e.g., sections 1 and 7 for `focus:auth`).
+For `quick` mode: use the inline category summaries below (do NOT read attack-vectors.md).
 
 Categories in priority order (aligned with OWASP Top 10:2025):
 
@@ -222,7 +240,7 @@ Flag sensitive code areas that are not vulnerable today but would break if modif
 5. **Map to OWASP** - A01:2025 through A10:2025
 6. **Map to CWE** - Most specific CWE ID (e.g., CWE-89, not CWE-74)
 7. **Map to NIST CSF 2.0** - Function and category
-8. **Map to compliance** - SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 (where applicable)
+8. **Map to compliance** (skip if `--lite`) - SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001
 9. **Write the fix** - Real, copy-paste-ready code patches
 
 ### Phase 7: Generate Report
@@ -275,7 +293,7 @@ Save the report to `./security-audit-report.md` in the project root.
 | RS (Respond) | RS.MA, RS.AN, RS.MI | X | [needs attention / acceptable] |
 | RC (Recover) | RC.RP, RC.CO | X | [needs attention / acceptable] |
 
-## Compliance Coverage
+## Compliance Coverage (omit if --lite)
 
 | Framework | Coverage | Details |
 |-----------|----------|---------|
@@ -294,7 +312,7 @@ Save the report to `./security-audit-report.md` in the project root.
 - **OWASP**: A05:2025 (Injection)
 - **CWE**: CWE-89 (SQL Injection)
 - **NIST CSF**: PR.DS (Data Security)
-- **Compliance**: SANS Top 25 #3 | ASVS V5.3.4 | PCI DSS 6.2.4 | T1190 | CC6.6 | A.8.28
+- **Compliance** (omit if --lite): SANS Top 25 #3 | ASVS V5.3.4 | PCI DSS 6.2.4 | T1190 | CC6.6 | A.8.28
 - **Location**: `path/to/file:123`
 - **Attack Vector**: [step-by-step]
 - **Impact**: [consequences]
@@ -360,9 +378,9 @@ Save the report to `./security-audit-report.md` in the project root.
 - OWASP Top 10:2025 coverage: [X/10 categories]
 - NIST CSF 2.0 coverage: [functions covered]
 - CWE coverage: [unique CWE IDs identified]
-- SANS/CWE Top 25 coverage: [X/25 matched]
-- ASVS 4.0 chapters covered: [chapters checked]
-- Additional frameworks: PCI DSS 4.0, MITRE ATT&CK, SOC 2, ISO 27001:2022
+- SANS/CWE Top 25 coverage: [X/25 matched] (omit if --lite)
+- ASVS 4.0 chapters covered: [chapters checked] (omit if --lite)
+- Additional frameworks: PCI DSS 4.0, MITRE ATT&CK, SOC 2, ISO 27001:2022 (omit if --lite)
 ```
 
 ## Execution Rules
@@ -370,7 +388,7 @@ Save the report to `./security-audit-report.md` in the project root.
 1. Read every route, controller, model, middleware, config, migration and seeder
 2. Every finding must reference actual code with file path and line number
 3. Every finding must show the vulnerable code snippet
-4. Every finding must have OWASP Top 10:2025, CWE ID and NIST CSF mapping. Include other compliance references (SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001) where applicable
+4. Every finding must have OWASP Top 10:2025, CWE ID and NIST CSF mapping. Unless `--lite` is set, also include other compliance references (SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001) where applicable
 5. Gray-box findings must include the role tested, endpoint, expected vs actual behavior
 6. If an area is clean, say so explicitly
 7. Don't fabricate findings - false positives waste time

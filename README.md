@@ -18,6 +18,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Code Smells** - Quality patterns that breed security bugs
 - **Framework Detection** - Tailored checks for Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go and Flask
 - **Findings First** - Shows findings by default, append `--fix` to include remediation code blocks
+- **Lite Mode** - Append `--lite` to reduce token usage (OWASP + CWE + NIST only, skips extra compliance mapping)
 - **Custom Checks** - Add your own `.md` checklists globally or per-project
 - **Phase Control** - Run individual phases (recon, white-box, gray-box, hotspots, smells) independently
 - **Multiple Modes** - Full audit, quick scan, gray-box only, focused deep dives or single phases
@@ -120,9 +121,14 @@ When installed per-project, use `/project:security-audit`.
 /security-audit --fix          # Full audit with remediation code blocks
 /security-audit quick --fix    # Quick scan with fixes
 /security-audit diff:main --fix
+
+# Lite mode - reduce token usage (OWASP + CWE + NIST only)
+/security-audit --lite         # Full audit without extra compliance mapping
+/security-audit quick --lite   # Cheapest useful scan
+/security-audit diff:main --lite --fix
 ```
 
-By default, the report shows findings only (vulnerable code, impact and a text description of what to fix). Append `--fix` to include copy-paste-ready remediation code blocks.
+By default, the report shows findings only (vulnerable code, impact and a text description of what to fix). Append `--fix` to include copy-paste-ready remediation code blocks. Append `--lite` to skip SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping and reduce token usage.
 
 ### Output
 
