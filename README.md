@@ -22,6 +22,8 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Custom Checks** - Add your own `.md` checklists globally or per-project
 - **Phase Control** - Run individual phases (recon, white-box, gray-box, hotspots, smells) independently
 - **Multiple Modes** - Full audit, quick scan, gray-box only, focused deep dives or single phases
+- **Severity Indicators** - Color-coded emoji for severity levels (🔴 Critical, 🟠 High, 🟡 Medium, 🟢 Low, 🔵 Info)
+- **PDF Export** - Automatically converts report to PDF if pandoc, wkhtmltopdf, weasyprint or md-to-pdf is installed
 
 ## What's Included
 
@@ -132,7 +134,19 @@ By default, the report shows findings only (vulnerable code, impact and a text d
 
 ### Output
 
-Report saves to `./security-audit-report.md` in your project root.
+Report saves to `./security-audit-report.md` in your project root. If a PDF converter is installed, it also saves `./security-audit-report.pdf`.
+
+Supported PDF converters (checked in order):
+
+| Converter | Install |
+|-----------|---------|
+| pandoc | `brew install pandoc` or [pandoc.org](https://pandoc.org/installing.html) |
+| wkhtmltopdf | `brew install wkhtmltopdf` or [wkhtmltopdf.org](https://wkhtmltopdf.org) |
+| weasyprint | `pip install weasyprint` |
+| md-to-pdf | `npm install -g md-to-pdf` |
+| mdpdf | `npm install -g mdpdf` |
+
+If no converter is found, the audit still completes - only the markdown report is generated.
 
 ### Token Usage Warning
 
@@ -249,17 +263,18 @@ Beyond the OWASP Top 10, the audit also checks:
 
 ## Report Structure
 
-1. Executive Summary (finding counts, risk assessment)
+1. Executive Summary (color-coded finding counts, risk assessment)
 2. OWASP Top 10:2025 Coverage Matrix
 3. NIST CSF 2.0 Coverage Matrix
-4. Critical & High Findings (with code + fixes)
-5. Medium Findings
-6. Low & Informational
-7. Gray-Box Findings (with role, endpoint, expected vs actual)
-8. Security Hotspots (with PR review guidance)
-9. Code Smells (with refactoring suggestions)
-10. Recommendations Summary (grouped by OWASP)
-11. Methodology
+4. Compliance Coverage (omitted with `--lite`)
+5. 🔴 Critical & 🟠 High Findings (with code + fixes)
+6. 🟡 Medium Findings
+7. 🟢 Low & 🔵 Informational
+8. 🔲 Gray-Box Findings (with role, endpoint, expected vs actual)
+9. 📍 Security Hotspots (with PR review guidance)
+10. 🧹 Code Smells (with refactoring suggestions)
+11. Recommendations Summary (grouped by OWASP)
+12. Methodology
 
 ## Contributing
 

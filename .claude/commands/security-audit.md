@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*)
+allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*), Bash(which:*), Bash(pandoc:*), Bash(wkhtmltopdf:*), Bash(weasyprint:*), Bash(md-to-pdf:*), Bash(mdpdf:*)
 description: Run a comprehensive white-box and gray-box security audit with OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping. Shows findings by default. Append --fix to include remediation code blocks.
 argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config|phase:1|phase:2|phase:3|phase:4|phase:5] [--fix] [--lite]"
 ---
@@ -260,38 +260,51 @@ Save the report to `./security-audit-report.md` in the project root.
 
 ## Executive Summary
 
-- Total findings: X
-- Critical: X | High: X | Medium: X | Low: X | Info: X
-- Gray-box findings: X
-- Security hotspots: X
-- Code smells: X
-- Overall risk assessment: [sentence summary]
+| Metric | Count |
+|--------|-------|
+| 🔴 Critical | X |
+| 🟠 High | X |
+| 🟡 Medium | X |
+| 🟢 Low | X |
+| 🔵 Informational | X |
+| 🔲 Gray-box findings | X |
+| 📍 Security hotspots | X |
+| 🧹 Code smells | X |
+| **Total findings** | **X** |
+
+**Overall Risk Assessment**: [sentence summary]
+
+---
 
 ## OWASP Top 10:2025 Coverage
 
 | OWASP ID | Category | Findings | Status |
 |----------|----------|----------|--------|
-| A01:2025 | Broken Access Control | X | [needs attention / acceptable] |
-| A02:2025 | Security Misconfiguration | X | [needs attention / acceptable] |
-| A03:2025 | Software Supply Chain Failures | X | [needs attention / acceptable] |
-| A04:2025 | Cryptographic Failures | X | [needs attention / acceptable] |
-| A05:2025 | Injection | X | [needs attention / acceptable] |
-| A06:2025 | Insecure Design | X | [needs attention / acceptable] |
-| A07:2025 | Identification and Auth Failures | X | [needs attention / acceptable] |
-| A08:2025 | Software and Data Integrity Failures | X | [needs attention / acceptable] |
-| A09:2025 | Security Logging and Alerting Failures | X | [needs attention / acceptable] |
-| A10:2025 | Mishandling of Exceptional Conditions | X | [needs attention / acceptable] |
+| A01:2025 | Broken Access Control | X | 🔴 Needs Attention / ✅ Acceptable |
+| A02:2025 | Security Misconfiguration | X | 🔴 Needs Attention / ✅ Acceptable |
+| A03:2025 | Software Supply Chain Failures | X | 🔴 Needs Attention / ✅ Acceptable |
+| A04:2025 | Cryptographic Failures | X | 🔴 Needs Attention / ✅ Acceptable |
+| A05:2025 | Injection | X | 🔴 Needs Attention / ✅ Acceptable |
+| A06:2025 | Insecure Design | X | 🔴 Needs Attention / ✅ Acceptable |
+| A07:2025 | Identification and Auth Failures | X | 🔴 Needs Attention / ✅ Acceptable |
+| A08:2025 | Software and Data Integrity Failures | X | 🔴 Needs Attention / ✅ Acceptable |
+| A09:2025 | Security Logging and Alerting Failures | X | 🔴 Needs Attention / ✅ Acceptable |
+| A10:2025 | Mishandling of Exceptional Conditions | X | 🔴 Needs Attention / ✅ Acceptable |
+
+---
 
 ## NIST CSF 2.0 Coverage
 
 | Function | Categories | Findings | Status |
 |----------|-----------|----------|--------|
-| GV (Govern) | GV.OC, GV.RM, GV.RR, GV.PO, GV.OV, GV.SC | X | [needs attention / acceptable] |
-| ID (Identify) | ID.AM, ID.RA, ID.IM | X | [needs attention / acceptable] |
-| PR (Protect) | PR.AA, PR.AT, PR.DS, PR.PS, PR.IR | X | [needs attention / acceptable] |
-| DE (Detect) | DE.CM, DE.AE | X | [needs attention / acceptable] |
-| RS (Respond) | RS.MA, RS.AN, RS.MI | X | [needs attention / acceptable] |
-| RC (Recover) | RC.RP, RC.CO | X | [needs attention / acceptable] |
+| GV (Govern) | GV.OC, GV.RM, GV.RR, GV.PO, GV.OV, GV.SC | X | 🔴 Needs Attention / ✅ Acceptable |
+| ID (Identify) | ID.AM, ID.RA, ID.IM | X | 🔴 Needs Attention / ✅ Acceptable |
+| PR (Protect) | PR.AA, PR.AT, PR.DS, PR.PS, PR.IR | X | 🔴 Needs Attention / ✅ Acceptable |
+| DE (Detect) | DE.CM, DE.AE | X | 🔴 Needs Attention / ✅ Acceptable |
+| RS (Respond) | RS.MA, RS.AN, RS.MI | X | 🔴 Needs Attention / ✅ Acceptable |
+| RC (Recover) | RC.RP, RC.CO | X | 🔴 Needs Attention / ✅ Acceptable |
+
+---
 
 ## Compliance Coverage (omit if --lite)
 
@@ -305,10 +318,12 @@ Save the report to `./security-audit-report.md` in the project root.
 | SOC 2 | X criteria with findings | [list criteria] |
 | ISO 27001:2022 | X controls with findings | [list controls] |
 
-## Critical & High Findings
+---
 
-### [CRITICAL-001] Title
-- **Severity**: CRITICAL
+## 🔴 Critical & 🟠 High Findings
+
+### 🔴 [CRITICAL-001] Title
+- **Severity**: 🔴 CRITICAL
 - **OWASP**: A05:2025 (Injection)
 - **CWE**: CWE-89 (SQL Injection)
 - **NIST CSF**: PR.DS (Data Security)
@@ -321,16 +336,36 @@ Save the report to `./security-audit-report.md` in the project root.
 - **Remediation**: [description of what to fix]
   [include fixed code block ONLY if --fix flag is set]
 
-## Medium Findings
-[same format]
+### 🟠 [HIGH-001] Title
+- **Severity**: 🟠 HIGH
+- [same fields as above]
 
-## Low & Informational Findings
-[condensed format]
+---
 
-## Gray-Box Findings
+## 🟡 Medium Findings
+
+### 🟡 [MEDIUM-001] Title
+- **Severity**: 🟡 MEDIUM
+- [same fields as Critical/High]
+
+---
+
+## 🟢 Low & 🔵 Informational Findings
+
+### 🟢 [LOW-001] Title
+- **Severity**: 🟢 LOW
+- [condensed format]
+
+### 🔵 [INFO-001] Title
+- **Severity**: 🔵 INFO
+- [condensed format]
+
+---
+
+## 🔲 Gray-Box Findings
 
 ### [GRAY-001] Title
-- **Severity**: [rating]
+- **Severity**: [🔴/🟠/🟡/🟢/🔵] [rating]
 - **OWASP**: [A01:2025/A06:2025/A07:2025]
 - **CWE**: [CWE-ID]
 - **NIST CSF**: [category]
@@ -343,7 +378,10 @@ Save the report to `./security-audit-report.md` in the project root.
 - **Remediation**: [description of what to fix]
   [include fixed code block ONLY if --fix flag is set]
 
-## Security Hotspots
+---
+
+## 📍 Security Hotspots
+
 ### [HOTSPOT-001] Title
 - **OWASP**: [relevant]
 - **CWE**: [CWE-ID]
@@ -354,7 +392,10 @@ Save the report to `./security-audit-report.md` in the project root.
 - **Risk if modified**: [what could go wrong]
 - **Review guidance**: [what to watch in PRs]
 
-## Code Smells
+---
+
+## 🧹 Code Smells
+
 ### [SMELL-001] Title
 - **OWASP**: [relevant, typically A06:2025]
 - **CWE**: [CWE-ID]
@@ -366,22 +407,48 @@ Save the report to `./security-audit-report.md` in the project root.
 - **Suggestion**: [description of what to refactor]
   [include refactored code block ONLY if --fix flag is set]
 
+---
+
 ## Recommendations Summary
+
 [prioritized action items grouped by OWASP category]
 
+---
+
 ## Methodology
-- Phases executed: [list phases run, e.g., 1-5 for full, 1-2 for quick]
-- White-box: [categories checked]
-- Gray-box: [roles tested, endpoints probed]
-- Hotspots: [count and sensitivity categories scanned]
-- Code smells: [structural, data handling, error handling, dependencies, design]
-- OWASP Top 10:2025 coverage: [X/10 categories]
-- NIST CSF 2.0 coverage: [functions covered]
-- CWE coverage: [unique CWE IDs identified]
-- SANS/CWE Top 25 coverage: [X/25 matched] (omit if --lite)
-- ASVS 4.0 chapters covered: [chapters checked] (omit if --lite)
-- Additional frameworks: PCI DSS 4.0, MITRE ATT&CK, SOC 2, ISO 27001:2022 (omit if --lite)
+
+| Aspect | Details |
+|--------|---------|
+| Phases executed | [list phases run, e.g., 1-5 for full, 1-2 for quick] |
+| White-box categories | [categories checked] |
+| Gray-box testing | [roles tested, endpoints probed] |
+| Security hotspots | [count and sensitivity categories scanned] |
+| Code smells | [structural, data handling, error handling, dependencies, design] |
+| OWASP Top 10:2025 | [X/10 categories covered] |
+| NIST CSF 2.0 | [functions covered] |
+| CWE | [X unique CWE IDs identified] |
+| SANS/CWE Top 25 | [X/25 matched] (omit if --lite) |
+| ASVS 4.0 | [chapters checked] (omit if --lite) |
+| Additional frameworks | PCI DSS 4.0, MITRE ATT&CK, SOC 2, ISO 27001:2022 (omit if --lite) |
+
+---
+
+*Report generated by [Claude Security Audit](https://github.com/afiqiqmal/claude-security-audit)*
 ```
+
+## Severity Indicators
+
+Use these emoji indicators consistently throughout the report for all severity references:
+
+| Emoji | Severity |
+|-------|----------|
+| 🔴 | CRITICAL |
+| 🟠 | HIGH |
+| 🟡 | MEDIUM |
+| 🟢 | LOW |
+| 🔵 | INFO |
+
+Apply the matching emoji before every severity label - in finding headers, the severity field, executive summary counts and OWASP/NIST coverage status columns. For gray-box findings, prefix the severity rating with the appropriate emoji.
 
 ## Execution Rules
 
@@ -410,3 +477,24 @@ Tell the developer:
 
 If `--fix` was NOT used, also tell the developer:
 > To generate the report again with code fixes included, run: `/security-audit [mode] --fix`
+
+### PDF Conversion (automatic)
+
+After saving the markdown report, attempt to convert it to PDF using **only already-installed** converters. **NEVER install, download or `npx`-run a converter that is not already installed on the system.** If a tool is not found, skip it - do not offer to install it automatically.
+
+Check for installed converters using `which` in this order. Only use the first one found:
+
+1. `which pandoc` - run `pandoc ./security-audit-report.md -o ./security-audit-report.pdf --pdf-engine=xelatex -V geometry:margin=1in -V mainfont="DejaVu Sans" -V monofont="DejaVu Sans Mono" --highlight-style=tango`
+2. `which wkhtmltopdf` - run `wkhtmltopdf ./security-audit-report.md ./security-audit-report.pdf`
+3. `which weasyprint` - run `weasyprint ./security-audit-report.md ./security-audit-report.pdf`
+4. `which md-to-pdf` - run `md-to-pdf ./security-audit-report.md`
+5. `which mdpdf` - run `mdpdf ./security-audit-report.md`
+
+If a converter is found:
+- Run the conversion command
+- Tell the developer: `PDF report saved to ./security-audit-report.pdf`
+
+If no converter is found:
+- Tell the developer: `No PDF converter found. To enable automatic PDF export, install one of: pandoc, wkhtmltopdf, weasyprint or md-to-pdf`
+- Do NOT install anything on behalf of the user
+- Do NOT fail the audit - the markdown report is the primary output
