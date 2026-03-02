@@ -14,10 +14,11 @@ if [ "${1:-}" = "--uninstall" ]; then
     echo ""
     COMMANDS_DIR="$HOME/.claude/commands"
     REFERENCES_DIR="$HOME/.claude/security-audit-references"
+    CUSTOM_DIR="$HOME/.claude/security-audit-custom"
     GUIDELINES_DIR="$HOME/.claude"
 
     REMOVED=0
-    for target in "$COMMANDS_DIR/security-audit.md" "$REFERENCES_DIR" "$GUIDELINES_DIR/security-audit-guidelines.md"; do
+    for target in "$COMMANDS_DIR/security-audit.md" "$REFERENCES_DIR" "$CUSTOM_DIR" "$GUIDELINES_DIR/security-audit-guidelines.md"; do
         if [ -e "$target" ]; then
             rm -rf "$target"
             echo "  Removed $target"
@@ -145,6 +146,23 @@ else
     INSTALLED=$((INSTALLED + 1))
 fi
 
+# Create custom checks directory and install template
+CUSTOM_DIR="$HOME/.claude/security-audit-custom"
+if [ ! -d "$CUSTOM_DIR" ]; then
+    mkdir -p "$CUSTOM_DIR"
+fi
+if [ ! -f "$CUSTOM_DIR/custom-template.md" ]; then
+    if install_file "references/custom-template.md" "$CUSTOM_DIR/custom-template.md"; then
+        echo -e "  ${GREEN}✓${NC} custom checks folder + template"
+        INSTALLED=$((INSTALLED + 1))
+    else
+        echo -e "  ${YELLOW}~${NC} custom checks folder created (template skipped)"
+        INSTALLED=$((INSTALLED + 1))
+    fi
+else
+    echo -e "  ${GREEN}✓${NC} custom checks folder (already exists)"
+fi
+
 # Install guidelines
 if install_file "security-audit-guidelines.md" "$GUIDELINES_DIR/security-audit-guidelines.md"; then
     echo -e "  ${GREEN}✓${NC} security-audit-guidelines.md"
@@ -167,6 +185,7 @@ echo ""
 echo -e "Installed to:"
 echo -e "  Command:    ${BLUE}$COMMANDS_DIR/security-audit.md${NC}"
 echo -e "  References: ${BLUE}$REFERENCES_DIR/${NC}"
+echo -e "  Custom:     ${BLUE}$CUSTOM_DIR/${NC}"
 echo -e "  Guidelines: ${BLUE}$GUIDELINES_DIR/security-audit-guidelines.md${NC}"
 echo ""
 echo "Usage in Claude Code:"

@@ -56,6 +56,10 @@ Read `~/.claude/security-audit-references/nist-csf-mapping.md` for the full mapp
 
 For framework-specific checks, read the matching file from `~/.claude/security-audit-references/frameworks/` based on the detected framework (e.g., `frameworks/laravel.md`, `frameworks/nextjs.md`).
 
+For custom checks, read all `.md` files from these folders if they exist:
+1. `~/.claude/security-audit-custom/` (global custom checks, apply to all projects)
+2. `.claude/security-audit-custom/` (project-level custom checks, in the project root)
+
 ## Audit Workflow
 
 ### Phase 0: Diff Scoping (diff mode only)
@@ -76,6 +80,7 @@ If `$ARGUMENTS` starts with `diff`:
 4. Trace data flow - where does user input enter, get stored, get rendered or returned?
 5. Check configuration files - `.env`, `config/`, `docker-compose.yml`, CI/CD pipelines
 6. Identify user roles and permission levels defined in the system
+7. Load custom checks - read all `.md` files from `~/.claude/security-audit-custom/` and `.claude/security-audit-custom/` if either folder exists. Treat each file as an additional checklist to run during Phase 2
 
 ### Phase 2: White-Box Attack Surface Analysis [NIST: ID + PR]
 

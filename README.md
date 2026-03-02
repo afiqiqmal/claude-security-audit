@@ -16,6 +16,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Code Smells** - Quality patterns that breed security bugs
 - **Framework Detection** - Tailored checks for Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go and Flask
 - **Findings First** - Shows findings by default, append `--fix` to include remediation code blocks
+- **Custom Checks** - Add your own `.md` checklists globally or per-project
 - **Multiple Modes** - Full audit, quick scan, gray-box only, or focused deep dives
 
 ## What's Included
@@ -28,6 +29,7 @@ claude-security-audit/
 ├── references/
 │   ├── attack-vectors.md           # 850+ security checks (OWASP 2025 + NIST tagged)
 │   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
+│   ├── custom-template.md          # Template for custom checks
 │   └── frameworks/                 # Framework-specific checklists
 │       ├── laravel.md
 │       ├── nextjs.md
@@ -77,6 +79,7 @@ When installed per-project, use `/project:security-audit`.
 | `attack-vectors.md` | `~/.claude/security-audit-references/` | 850+ OWASP 2025/NIST-tagged security checks |
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
 | `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 10 framework-specific checklists |
+| `custom-template.md` | `~/.claude/security-audit-custom/` | Template for writing custom checks |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
 
 ## Usage
@@ -112,6 +115,31 @@ By default, the report shows findings only (vulnerable code, impact and a text d
 ### Output
 
 Report saves to `./security-audit-report.md` in your project root.
+
+## Custom Checks
+
+Add your own security checklists that run alongside the built-in checks. The audit reads all `.md` files from two folders:
+
+| Folder | Scope | Use Case |
+|--------|-------|----------|
+| `~/.claude/security-audit-custom/` | Global (all projects) | Company-wide standards, compliance rules |
+| `.claude/security-audit-custom/` | Project-level | Project-specific checks, internal API rules |
+
+A template file is installed at `~/.claude/security-audit-custom/custom-template.md` during setup. Copy and rename it to create your own checklists.
+
+### Writing Custom Checks
+
+Organize checks under headings with OWASP and NIST tags:
+
+```markdown
+## Internal API Standards [A01:2025, A05:2025 | PR.AA, PR.DS]
+
+- [ ] All internal endpoints require service-to-service auth tokens
+- [ ] Response bodies never include internal database IDs
+- [ ] Deprecated endpoints return 410 Gone
+```
+
+Custom checks are loaded during Phase 1 (reconnaissance) and run as additional checklists during Phase 2 (white-box analysis). Both global and project-level checks are merged - project-level checks do not override global ones.
 
 ## OWASP Top 10:2025 Coverage
 
