@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*), Bash(which:*), Bash(pandoc:*), Bash(wkhtmltopdf:*), Bash(weasyprint:*), Bash(md-to-pdf:*), Bash(mdpdf:*)
+allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(bundle:*), Bash(govulncheck:*), Bash(dotnet:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*), Bash(which:*), Bash(pandoc:*), Bash(wkhtmltopdf:*), Bash(weasyprint:*), Bash(md-to-pdf:*), Bash(mdpdf:*)
 description: Run a comprehensive white-box and gray-box security audit with OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping. Shows findings by default. Append --fix to include remediation code blocks.
 argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config|phase:1|phase:2|phase:3|phase:4|phase:5] [--fix] [--lite]"
 ---
@@ -231,19 +231,21 @@ Flag sensitive code areas that are not vulnerable today but would break if modif
 **Dependencies** [GV.SC | A03:2025]: Unused packages, wildcard versions, duplicate libraries, unverified transitive deps
 **Design** [GV.RM | A06:2025]: Missing input validation layer, no separation of public vs authenticated routes, business logic in controllers
 
-### Phase 6: Deep Dive (for each finding)
+### Deep Dive (for each finding)
+
+For every finding from Phases 2-5, perform these steps before writing it into the report:
 
 1. **Locate** - Exact file, line number and code snippet
 2. **Explain the attack** - Step-by-step conceptual proof-of-concept
 3. **Assess impact** - What data is at risk? Can the attacker escalate?
-4. **Rate severity** - CRITICAL / HIGH / MEDIUM / LOW / INFO
+4. **Rate severity** - 🔴 CRITICAL / 🟠 HIGH / 🟡 MEDIUM / 🟢 LOW / 🔵 INFO
 5. **Map to OWASP** - A01:2025 through A10:2025
 6. **Map to CWE** - Most specific CWE ID (e.g., CWE-89, not CWE-74)
 7. **Map to NIST CSF 2.0** - Function and category
 8. **Map to compliance** (skip if `--lite`) - SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001
 9. **Write the fix** - Real, copy-paste-ready code patches
 
-### Phase 7: Generate Report
+### Generate Report
 
 Save the report to `./security-audit-report.md` in the project root.
 
@@ -492,7 +494,9 @@ Check for installed converters using `which` in this order. Only use the first o
 
 If a converter is found:
 - Run the conversion command
-- Tell the developer: `PDF report saved to ./security-audit-report.pdf`
+- If conversion succeeds, tell the developer: `PDF report saved to ./security-audit-report.pdf`
+- If conversion fails (non-zero exit code), tell the developer: `PDF conversion failed. The markdown report is still available at ./security-audit-report.md`
+- Do NOT retry with a different converter - just report the failure and move on
 
 If no converter is found:
 - Tell the developer: `No PDF converter found. To enable automatic PDF export, install one of: pandoc, wkhtmltopdf, weasyprint or md-to-pdf`

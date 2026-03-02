@@ -4,13 +4,15 @@ Global security audit standards for Claude Code projects. Defines the methodolog
 
 ## Severity Ratings
 
-| Rating | Criteria | Action |
-|--------|----------|--------|
-| CRITICAL | Remote code execution, auth bypass, full data breach, admin takeover | Fix tonight |
-| HIGH | Privilege escalation, significant data exposure, account takeover | Fix this sprint |
-| MEDIUM | XSS, CSRF, partial data exposure, IDOR with limited scope | Fix next sprint |
-| LOW | Information disclosure, missing headers, minor misconfigurations | Schedule fix |
-| INFO | Best practice recommendations, defense-in-depth suggestions | Consider adopting |
+| Indicator | Rating | Criteria | Action |
+|-----------|--------|----------|--------|
+| 🔴 | CRITICAL | Remote code execution, auth bypass, full data breach, admin takeover | Fix tonight |
+| 🟠 | HIGH | Privilege escalation, significant data exposure, account takeover | Fix this sprint |
+| 🟡 | MEDIUM | XSS, CSRF, partial data exposure, IDOR with limited scope | Fix next sprint |
+| 🟢 | LOW | Information disclosure, missing headers, minor misconfigurations | Schedule fix |
+| 🔵 | INFO | Best practice recommendations, defense-in-depth suggestions | Consider adopting |
+
+Emoji indicators are used throughout the report for visual severity scanning.
 
 ## Testing Types
 
@@ -71,14 +73,34 @@ Global security audit standards for Claude Code projects. Defines the methodolog
 
 See `~/.claude/security-audit-references/compliance-mapping.md` for the full cross-reference tables.
 
+## Audit Modes
+
+| Mode | Phases | Description |
+|------|--------|-------------|
+| `full` (default) | 1-5 | All phases: recon + white-box + gray-box + hotspots + smells |
+| `quick` | 1-2 | CRITICAL and HIGH only, no gray-box |
+| `gray` | 1, 3 | Gray-box testing only |
+| `focus:auth` | 1, 2, 4 | Authentication and authorization deep dive |
+| `focus:api` | 1, 2, 4 | API security and input validation deep dive |
+| `focus:config` | 1, 2, 4 | Configuration and infrastructure deep dive |
+| `diff` / `diff:BRANCH` | 0, 1, 2, 4 | Scan only git-changed files |
+| `phase:1` - `phase:5` | 1 + N | Run a single phase |
+
+### Flags
+
+| Flag | Effect |
+|------|--------|
+| `--fix` | Include copy-paste-ready remediation code blocks (off by default) |
+| `--lite` | OWASP + CWE + NIST only, skip SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
+
 ## Report Conventions
 
 - Every finding must have OWASP Top 10:2025, CWE ID and NIST CSF mapping (other frameworks where applicable)
 - One finding per issue (don't bundle multiple vulnerabilities)
 - Show exact file path and line number
-- Include both vulnerable code and fixed code
+- Include vulnerable code; include fixed code only when `--fix` is set
 - Use fenced code blocks with language identifiers
-- Prefix IDs: `[CRITICAL-001]`, `[HIGH-001]`, `[GRAY-001]`, `[HOTSPOT-001]`, `[SMELL-001]`
+- Prefix IDs with emoji: `🔴 [CRITICAL-001]`, `🟠 [HIGH-001]`, `🟡 [MEDIUM-001]`, `🟢 [LOW-001]`, `🔵 [INFO-001]`, `[GRAY-001]`, `[HOTSPOT-001]`, `[SMELL-001]`
 - Gray-box findings must include: role tested, endpoint, expected vs actual behavior
 - Group recommendations by OWASP category in the summary
 
@@ -103,4 +125,6 @@ This file is read by `/security-audit` when installed globally at `~/.claude/sec
 
 ## Output Location
 
-Reports save to `./security-audit-report.md` in the project root. Add to `.gitignore` if reports should not be committed, or commit them as part of your security review workflow.
+Reports save to `./security-audit-report.md` in the project root. If a PDF converter is installed (pandoc, wkhtmltopdf, weasyprint or md-to-pdf), a PDF version is also generated at `./security-audit-report.pdf`.
+
+Add to `.gitignore` if reports should not be committed, or commit them as part of your security review workflow.

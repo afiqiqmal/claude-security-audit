@@ -9,10 +9,22 @@ Claude Code slash command for white-box and gray-box security auditing. Maps fin
 - No em-dashes. Use ` - ` (space-hyphen-space) instead
 - No comma before "and" (no Oxford comma)
 - No AI jargon: avoid "leverage", "utilize", "cutting-edge"
-- Every finding must have OWASP, CWE ID and NIST CSF 2.0 mapping (other compliance frameworks where applicable)
+- Every finding must have OWASP, CWE ID and NIST CSF 2.0 mapping (other compliance frameworks where applicable, skip extras with `--lite`)
 - Every finding must include exact file path, line number and vulnerable code
 - Code fixes are only included when user passes `--fix` flag
-- Reports save to `./security-audit-report.md` in the project root (not global)
+- Severity indicators: 🔴 CRITICAL, 🟠 HIGH, 🟡 MEDIUM, 🟢 LOW, 🔵 INFO
+- Reports save to `./security-audit-report.md` (and `.pdf` if a converter is installed)
+
+## Modes
+
+- `full` (default) - All phases (1-5)
+- `quick` - CRITICAL and HIGH only (phases 1-2)
+- `gray` - Gray-box testing only (phases 1, 3)
+- `focus:auth` / `focus:api` / `focus:config` - Deep dives (phases 1, 2, 4)
+- `diff` / `diff:BRANCH` - Git-changed files only (phases 0, 1, 2, 4)
+- `phase:1` through `phase:5` - Single phase execution
+- `--fix` - Include remediation code blocks
+- `--lite` - OWASP + CWE + NIST only (reduces token usage)
 
 ## Structure
 
@@ -20,6 +32,7 @@ Claude Code slash command for white-box and gray-box security auditing. Maps fin
 - `references/attack-vectors.md` - Detailed checklists per attack category
 - `references/nist-csf-mapping.md` - NIST CSF 2.0 mapping tables
 - `references/compliance-mapping.md` - CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 mapping
+- `references/custom-template.md` - Template for custom security checks
 - `references/frameworks/` - Framework-specific checklists (Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go, Flask)
-- `security-audit-guidelines.md` - Severity ratings and conventions
+- `security-audit-guidelines.md` - Severity ratings, modes and conventions
 - `install.sh` - Installs command and references to `~/.claude/`
