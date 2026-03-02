@@ -23,7 +23,7 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] WebSocket channels and real-time events are isolated per tenant (CWE-863)
 - [ ] Exported reports and downloads are scoped to the requesting tenant (CWE-200)
 
-## Authentication and Session [A07:2025, A01:2025 | PR.AA]
+## Authentication and Session [A01:2025, A07:2025 | PR.AA]
 
 - [ ] Tenant identification happens before authentication (subdomain, header or token claim) (CWE-287)
 - [ ] JWT tokens or session data include tenant ID claim (CWE-862)
@@ -33,7 +33,7 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] OAuth/SSO configurations are per-tenant (CWE-287)
 - [ ] API keys are bound to a specific tenant (CWE-862)
 
-## Data Segregation [A04:2025, A01:2025 | PR.DS]
+## Data Segregation [A01:2025, A04:2025 | PR.DS]
 
 - [ ] Tenant data is logically or physically separated in the database (CWE-653)
 - [ ] Database migrations do not break tenant isolation (CWE-863)
@@ -57,7 +57,7 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] Tenant admin cannot escalate to platform admin (CWE-269)
 - [ ] Tenant admin actions are scoped to their own tenant only (CWE-863)
 - [ ] User invitation flow validates the target tenant (CWE-862)
-- [ ] Role definitions are per-tenant (tenant A's admin is not tenant B's admin) (CWE-285)
+- [ ] Role definitions are per-tenant (tenant A's admin is not tenant B's admin) (CWE-862)
 - [ ] Billing and subscription changes are authorized per-tenant (CWE-862)
 - [ ] Tenant configuration changes do not affect other tenants (CWE-863)
 - [ ] Platform admin access to tenant data requires justification and is logged (CWE-778)

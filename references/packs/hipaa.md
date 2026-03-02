@@ -11,7 +11,7 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 /security-audit full --fix --pack hipaa
 ```
 
-## PHI Data Protection [A04:2025, A01:2025 | PR.DS, PR.AA]
+## PHI Data Protection [A01:2025, A04:2025 | PR.DS, PR.AA]
 
 - [ ] PHI is encrypted at rest using AES-256 or equivalent (CWE-311)
 - [ ] PHI is encrypted in transit using TLS 1.2+ (CWE-319)
@@ -20,15 +20,15 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] PHI is never included in URLs or query parameters (CWE-598)
 - [ ] PHI is never stored in browser localStorage, sessionStorage or cookies (CWE-922)
 - [ ] Backups containing PHI are encrypted (CWE-311)
-- [ ] PHI at rest has documented encryption key management and rotation (CWE-320)
+- [ ] PHI at rest has documented encryption key management and rotation (CWE-324)
 
 ## Access Controls [A01:2025, A07:2025 | PR.AA]
 
 - [ ] Role-based access control enforced for all PHI endpoints (CWE-862)
-- [ ] Minimum necessary access - users only see PHI required for their role (CWE-285)
+- [ ] Minimum necessary access - users only see PHI required for their role (CWE-862)
 - [ ] Break-the-glass / emergency access has audit logging and approval workflow (CWE-778)
 - [ ] Patient consent is verified before sharing PHI with third parties (CWE-862)
-- [ ] Unique user identification - no shared accounts for PHI access (CWE-287)
+- [ ] Unique user identification - no shared accounts for PHI access (CWE-306)
 - [ ] Automatic session timeout after inactivity (15 minutes recommended) (CWE-613)
 - [ ] Multi-factor authentication required for remote PHI access (CWE-308)
 
@@ -36,8 +36,8 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 
 - [ ] All PHI access events are logged (read, create, update, delete) (CWE-778)
 - [ ] Audit logs include user ID, timestamp, action, resource accessed and IP address (CWE-778)
-- [ ] Audit logs are tamper-proof (append-only or integrity-protected) (CWE-779)
-- [ ] Audit logs are retained for minimum 6 years (HIPAA requirement) (CWE-779)
+- [ ] Audit logs are tamper-proof (append-only or integrity-protected) (CWE-778)
+- [ ] Audit logs are retained for minimum 6 years (HIPAA requirement) (CWE-778)
 - [ ] Failed access attempts to PHI are logged and alerted on (CWE-778)
 - [ ] Audit log exports are available for compliance reviews (CWE-778)
 - [ ] PHI disclosure tracking - who accessed what patient data and when (CWE-778)

@@ -1,6 +1,6 @@
 # Claude Security Audit
 
-A Claude Code slash command for running comprehensive white-box and gray-box security audits on your projects, with findings mapped to OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
+A Claude Code slash command for running comprehensive white-box and gray-box security audits on your projects, with findings mapped to OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS/CWE Top 25, OWASP ASVS 5.0, PCI DSS 4.0.1, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
 
 ## Features
 
@@ -9,7 +9,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **OWASP Top 10:2025 Coverage** - All 10 categories explicitly tested (A01-A10:2025)
 - **CWE Mapping** - Every finding tagged with specific CWE IDs
 - **NIST CSF 2.0 Mapping** - Every finding maps to Govern, Identify, Protect, Detect, Respond or Recover
-- **Multi-Framework Compliance** - SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022
+- **Multi-Framework Compliance** - SANS/CWE Top 25, OWASP ASVS 5.0, PCI DSS 4.0.1, MITRE ATT&CK, SOC 2 and ISO 27001:2022
 - **White-Box Testing** - 20 attack categories with 475+ individual checks
 - **AI/LLM Security** - Prompt injection, output sanitization, RAG poisoning, cost monitoring, tool calling permissions
 - **Diff Mode** - Scan only git-changed files for fast PR-level reviews
@@ -69,6 +69,8 @@ claude-security-audit/
 ├── security-audit-guidelines.md    # Severity ratings, conventions, framework detection
 ├── install.sh                      # One-command installer
 ├── CLAUDE.md                       # Project context for Claude Code
+├── LICENSE
+├── .gitignore
 └── README.md
 ```
 
@@ -308,12 +310,12 @@ Load compliance-specific checklists with `--pack`:
 
 | Pack | Checks | Focus Areas |
 |------|--------|-------------|
-| `hipaa` | 35 | PHI protection, access controls, audit trails, BAA requirements, breach notification |
-| `gdpr` | 38 | Consent, data subject rights, data protection by design, international transfers |
-| `fintech` | 40 | Transaction security, PCI DSS, fraud detection, KYC/AML, regulatory compliance |
-| `saas-multi-tenant` | 42 | Tenant isolation, cross-tenant vulnerabilities, resource limits, administration |
-| `soc2` | 50 | Trust Service Criteria (CC6-CC8), monitoring, change management, availability |
-| `education` | 35 | FERPA/COPPA student data, parental consent, directory info, age verification |
+| `hipaa` | 36 | PHI protection, access controls, audit trails, BAA requirements, breach notification |
+| `gdpr` | 39 | Consent, data subject rights, data protection by design, international transfers, breach management |
+| `fintech` | 42 | Transaction security, PCI DSS, fraud detection, regulatory compliance (KYC/AML) |
+| `saas-multi-tenant` | 43 | Tenant isolation, cross-tenant vulnerabilities, resource limits, tenant administration |
+| `soc2` | 50 | Trust Service Criteria (CC6-CC8), monitoring, change management, availability, vendor management |
+| `education` | 35 | FERPA/COPPA student data, parental consent, directory information, age verification |
 
 ```bash
 /security-audit --pack hipaa                    # Single pack
@@ -428,12 +430,12 @@ Results are saved to `./security-audit-triage.md`. This is useful for tracking t
 |---|----------|----------|----------------------|
 | 1 | Broken Access Control | A01:2025 | Now includes SSRF (was separate A10:2021) |
 | 2 | Security Misconfiguration | A02:2025 | Moved up from #5 |
-| 3 | Software Supply Chain Failures | A03:2025 | NEW - expands "Vulnerable Components" to full supply chain |
+| 3 | Software Supply Chain Failures | A03:2025 | NEW - expands "Vulnerable and Outdated Components" to full supply chain |
 | 4 | Cryptographic Failures | A04:2025 | Moved from #2 to #4 |
 | 5 | Injection | A05:2025 | Moved from #3 to #5 |
 | 6 | Insecure Design | A06:2025 | Moved from #4 to #6 |
-| 7 | Identification and Auth Failures | A07:2025 | Unchanged |
-| 8 | Software and Data Integrity Failures | A08:2025 | Unchanged |
+| 7 | Authentication Failures | A07:2025 | Renamed - dropped "Identification and" |
+| 8 | Software or Data Integrity Failures | A08:2025 | Renamed - "and" changed to "or" |
 | 9 | Security Logging and Alerting Failures | A09:2025 | Renamed - emphasis on alerting |
 | 10 | Mishandling of Exceptional Conditions | A10:2025 | NEW - fail-open logic, crashes, silent failures |
 
@@ -444,10 +446,10 @@ Every finding is tagged with the applicable compliance references:
 | Framework | Version | What It Provides |
 |-----------|---------|-----------------|
 | CWE | 4.x | Specific weakness IDs per finding (e.g., CWE-89 for SQL injection) |
-| SANS/CWE Top 25 | 2024 | Flags findings matching the 25 most dangerous software weaknesses |
-| OWASP ASVS | 4.0 | Maps findings to 286 verification requirements across 14 chapters (L1/L2/L3) |
-| PCI DSS | 4.0 | Maps findings to payment card industry requirements (Req 2-12) |
-| MITRE ATT&CK | v15 | Maps findings to attacker techniques (Initial Access through Impact) |
+| SANS/CWE Top 25 | 2025 | Flags findings matching the 25 most dangerous software weaknesses |
+| OWASP ASVS | 5.0 | Maps findings to verification requirements across chapters (L1/L2/L3) |
+| PCI DSS | 4.0.1 | Maps findings to payment card industry requirements (Req 2-12) |
+| MITRE ATT&CK | v18 | Maps findings to attacker techniques (Initial Access through Impact) |
 | SOC 2 | 2017 | Maps findings to Trust Service Criteria (CC6, CC7, CC8) |
 | ISO 27001 | 2022 | Maps findings to Annex A controls (A.5-A.8) |
 | NIST CSF | 2.0 | Maps findings to Govern, Identify, Protect, Detect, Respond, Recover |

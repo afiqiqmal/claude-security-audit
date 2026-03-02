@@ -2,7 +2,7 @@
 
 ## Project
 
-Claude Code slash command for white-box and gray-box security auditing. Maps findings to OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022. Includes security hotspots, code smells and framework-specific checks.
+Claude Code slash command for white-box and gray-box security auditing. Maps findings to OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS/CWE Top 25, OWASP ASVS 5.0, PCI DSS 4.0.1, MITRE ATT&CK, SOC 2 and ISO 27001:2022. Includes security hotspots, code smells and framework-specific checks.
 
 ## Conventions
 

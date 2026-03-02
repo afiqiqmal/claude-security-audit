@@ -19,7 +19,7 @@ Detection: `package.json` + `nuxt.config`
 - [ ] Server routes do not pass raw user input to `$fetch` or `ofetch` (SSRF)
 - [ ] File uploads via `readMultipartFormData()` validate file type and size
 
-## Auto-Imports and Composables [A05:2025, A04:2025 | PR.DS]
+## Auto-Imports and Composables [A04:2025, A05:2025 | PR.DS]
 - [ ] Auto-imported composables do not accidentally expose server-only logic to client
 - [ ] `useState()` does not store sensitive data (it serializes to client)
 - [ ] `useFetch()` and `useAsyncData()` do not leak server-side secrets in response

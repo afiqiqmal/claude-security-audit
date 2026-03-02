@@ -33,8 +33,8 @@ Emoji indicators are used throughout the report for visual severity scanning.
 | A04:2025 | Cryptographic Failures | Weak hashing, hardcoded secrets, missing encryption |
 | A05:2025 | Injection | SQLi, XSS, command injection, SSTI, NoSQL injection |
 | A06:2025 | Insecure Design | Missing rate limits, workflow bypass, race conditions, no threat modeling |
-| A07:2025 | Identification and Auth Failures | Session fixation, JWT flaws, brute force, weak reset flows |
-| A08:2025 | Software and Data Integrity Failures | Insecure deserialization, CI/CD injection, unsigned webhooks |
+| A07:2025 | Authentication Failures | Session fixation, JWT flaws, brute force, weak reset flows |
+| A08:2025 | Software or Data Integrity Failures | Insecure deserialization, CI/CD injection, unsigned webhooks |
 | A09:2025 | Security Logging and Alerting Failures | No audit logs, sensitive data in logs, logging without alerting |
 | A10:2025 | Mishandling of Exceptional Conditions | Fail-open logic, stack trace leaks, resource exhaustion, silent failures |
 
@@ -42,7 +42,7 @@ Emoji indicators are used throughout the report for visual severity scanning.
 
 - SSRF absorbed into A01 (no longer standalone A10:2021)
 - Security Misconfiguration jumped from #5 to #2
-- A03 is now **Software Supply Chain Failures** (was "Vulnerable Components")
+- A03 is now **Software Supply Chain Failures** (was "Vulnerable and Outdated Components")
 - A09 renamed to emphasize **Alerting** (not just monitoring)
 - A10 is **NEW**: Mishandling of Exceptional Conditions (fail-open, crashes, silent failures)
 
@@ -64,10 +64,10 @@ Emoji indicators are used throughout the report for visual severity scanning.
 | OWASP Top 10 | 2025 | A01:2025 - A10:2025 | A05:2025 |
 | CWE | 4.x | CWE-{ID} | CWE-89 |
 | NIST CSF | 2.0 | {Function}.{Category} | PR.DS |
-| SANS/CWE Top 25 | 2024 | SANS Top 25 #{rank} | SANS Top 25 #3 |
-| OWASP ASVS | 4.0 | ASVS V{chapter}.{section}.{req} | ASVS V5.3.4 |
-| PCI DSS | 4.0 | PCI DSS {req} | PCI DSS 6.2.4 |
-| MITRE ATT&CK | v15 | T{ID} | T1190 |
+| SANS/CWE Top 25 | 2025 | SANS Top 25 #{rank} | SANS Top 25 #3 |
+| OWASP ASVS | 5.0 | ASVS V{chapter}.{section}.{req} | ASVS V5.3.4 |
+| PCI DSS | 4.0.1 | PCI DSS {req} | PCI DSS 6.2.4 |
+| MITRE ATT&CK | v18 | T{ID} | T1190 |
 | SOC 2 | 2017 | CC{X}.{Y} | CC6.1 |
 | ISO 27001 | 2022 | A.{X}.{Y} | A.8.28 |
 

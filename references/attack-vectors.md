@@ -1,6 +1,6 @@
 # Attack Vectors Reference
 
-Detailed checklists for each attack category. Use these as a systematic guide when auditing each area. Every section is tagged with OWASP Top 10:2025, NIST CSF 2.0 and top CWE IDs. See `compliance-mapping.md` for full cross-references to SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
+Detailed checklists for each attack category. Use these as a systematic guide when auditing each area. Every section is tagged with OWASP Top 10:2025, NIST CSF 2.0 and top CWE IDs. See `compliance-mapping.md` for full cross-references to SANS/CWE Top 25, OWASP ASVS 5.0, PCI DSS 4.0.1, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
 
 ## OWASP Top 10:2025 Changes from 2021
 
@@ -8,12 +8,12 @@ Detailed checklists for each attack category. Use these as a systematic guide wh
 |------|----------|-------------|
 | A01:2025 | Broken Access Control (now includes SSRF) | A01:2021 + A10:2021 merged |
 | A02:2025 | Security Misconfiguration | A05:2021 (moved up to #2) |
-| A03:2025 | Software Supply Chain Failures | A06:2021 expanded (was "Vulnerable Components") |
+| A03:2025 | Software Supply Chain Failures | A06:2021 expanded (was "Vulnerable and Outdated Components") |
 | A04:2025 | Cryptographic Failures | A02:2021 (moved to #4) |
 | A05:2025 | Injection | A03:2021 (moved to #5) |
 | A06:2025 | Insecure Design | A04:2021 (moved to #6) |
-| A07:2025 | Identification and Authentication Failures | A07:2021 (unchanged) |
-| A08:2025 | Software and Data Integrity Failures | A08:2021 (unchanged) |
+| A07:2025 | Authentication Failures | A07:2021 (renamed, dropped "Identification and") |
+| A08:2025 | Software or Data Integrity Failures | A08:2021 (renamed, "and" changed to "or") |
 | A09:2025 | Security Logging and Alerting Failures | A09:2021 (renamed, emphasis on alerting) |
 | A10:2025 | Mishandling of Exceptional Conditions | NEW |
 
@@ -24,8 +24,8 @@ Detailed checklists for each attack category. Use these as a systematic guide wh
 4. [Cryptographic Failures (A04:2025)](#4-cryptographic-failures-a042025--prds--cwe-327-cwe-328-cwe-330-cwe-321)
 5. [Injection (A05:2025)](#5-injection-a052025--prds-decm--cwe-79-cwe-89-cwe-78-cwe-94-cwe-917)
 6. [Insecure Design (A06:2025)](#6-insecure-design-a062025--gvrm--cwe-209-cwe-434-cwe-799-cwe-841)
-7. [Identification and Authentication Failures (A07:2025)](#7-identification-and-authentication-failures-a072025--praa--cwe-287-cwe-307-cwe-384-cwe-798)
-8. [Software and Data Integrity Failures (A08:2025)](#8-software-and-data-integrity-failures-a082025--prds-gvsc--cwe-502-cwe-345-cwe-494-cwe-915)
+7. [Authentication Failures (A07:2025)](#7-authentication-failures-a072025--praa--cwe-287-cwe-307-cwe-384-cwe-798)
+8. [Software or Data Integrity Failures (A08:2025)](#8-software-or-data-integrity-failures-a082025--prds-gvsc--cwe-502-cwe-345-cwe-494-cwe-915)
 9. [Security Logging and Alerting Failures (A09:2025)](#9-security-logging-and-alerting-failures-a092025--decm-deae--cwe-778-cwe-532-cwe-117)
 10. [Mishandling of Exceptional Conditions (A10:2025)](#10-mishandling-of-exceptional-conditions-a102025--deae--cwe-754-cwe-755-cwe-248-cwe-390)
 11. [XSS](#11-xss-a052025--prds--cwe-79-cwe-80-cwe-83)
@@ -259,7 +259,7 @@ Covers fundamental design flaws, not implementation bugs.
 
 ---
 
-## 7. Identification and Authentication Failures [A07:2025 | PR.AA | CWE-287, CWE-307, CWE-384, CWE-798]
+## 7. Authentication Failures [A07:2025 | PR.AA | CWE-287, CWE-307, CWE-384, CWE-798]
 
 ### Sessions
 - [ ] Are session IDs generated with a CSPRNG?
@@ -307,7 +307,7 @@ Covers fundamental design flaws, not implementation bugs.
 
 ---
 
-## 8. Software and Data Integrity Failures [A08:2025 | PR.DS, GV.SC | CWE-502, CWE-345, CWE-494, CWE-915]
+## 8. Software or Data Integrity Failures [A08:2025 | PR.DS, GV.SC | CWE-502, CWE-345, CWE-494, CWE-915]
 
 ### Software Integrity
 - [ ] Are CI/CD pipelines protected from unauthorized modification?

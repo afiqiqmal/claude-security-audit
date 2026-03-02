@@ -99,8 +99,8 @@ Tag every finding with all applicable frameworks:
 - **A04:2025** - Cryptographic Failures
 - **A05:2025** - Injection
 - **A06:2025** - Insecure Design
-- **A07:2025** - Identification and Authentication Failures
-- **A08:2025** - Software and Data Integrity Failures
+- **A07:2025** - Authentication Failures
+- **A08:2025** - Software or Data Integrity Failures
 - **A09:2025** - Security Logging and Alerting Failures
 - **A10:2025** - Mishandling of Exceptional Conditions
 
@@ -110,7 +110,7 @@ Tag every finding with all applicable frameworks:
 - **ID (Identify)** - ID.AM, ID.RA, ID.IM
 - **PR (Protect)** - PR.AA, PR.AT, PR.DS, PR.PS, PR.IR
 - **DE (Detect)** - DE.CM, DE.AE
-- **RS (Respond)** - RS.MA, RS.AN, RS.MI
+- **RS (Respond)** - RS.MA, RS.AN, RS.CO, RS.MI
 - **RC (Recover)** - RC.RP, RC.CO
 
 ### CWE (Common Weakness Enumeration)
@@ -121,8 +121,8 @@ Tag each finding with the most specific CWE ID (e.g., CWE-89 for SQL injection, 
 
 When `--lite` is NOT set, also tag findings with:
 - **SANS/CWE Top 25** - Note if the finding matches a Top 25 entry (e.g., "SANS Top 25 #3")
-- **OWASP ASVS 4.0** - Reference the ASVS chapter and requirement (e.g., "ASVS V5.3.4")
-- **PCI DSS 4.0** - Reference the requirement (e.g., "PCI DSS 6.2.4") - especially for apps handling payment data
+- **OWASP ASVS 5.0** - Reference the ASVS chapter and requirement (e.g., "ASVS V5.3.4")
+- **PCI DSS 4.0.1** - Reference the requirement (e.g., "PCI DSS 6.2.4") - especially for apps handling payment data
 - **MITRE ATT&CK** - Reference the technique ID (e.g., "T1190") - shows how attackers exploit the finding
 - **SOC 2** - Reference the Trust Service Criteria (e.g., "CC6.1") - for SaaS compliance
 - **ISO 27001:2022** - Reference the Annex A control (e.g., "A.8.28") - for ISO-certified organizations
@@ -177,9 +177,9 @@ If `$ARGUMENTS` starts with `diff`:
 
 For `full`, `diff`, `recheck` and `phase:2` modes: read `~/.claude/security-audit-references/attack-vectors.md` for the detailed checklist.
 For `focus` modes: read only the relevant sections of `attack-vectors.md`:
-- `focus:auth` - sections 1 (Broken Access Control) and 7 (Identification and Authentication Failures)
+- `focus:auth` - sections 1 (Broken Access Control) and 7 (Authentication Failures)
 - `focus:api` - sections 1 (Broken Access Control), 5 (Injection), 6 (Insecure Design) and 14 (API Security)
-- `focus:config` - sections 2 (Security Misconfiguration), 3 (Software Supply Chain Failures), 8 (Software and Data Integrity Failures) and 16 (Infrastructure & DevOps)
+- `focus:config` - sections 2 (Security Misconfiguration), 3 (Software Supply Chain Failures), 8 (Software or Data Integrity Failures) and 16 (Infrastructure & DevOps)
 
 For `quick` mode: use the inline category summaries below (do NOT read attack-vectors.md).
 
@@ -191,8 +191,8 @@ Categories in priority order (aligned with OWASP Top 10:2025):
 4. **Cryptographic Failures** [A04:2025 | PR.DS] - Weak hashing, plaintext secrets, missing encryption at rest/transit, deprecated algorithms, hardcoded keys, exposed secrets in client bundles, weak TLS configuration
 5. **Injection** [A05:2025 | PR.DS, DE.CM] - SQL, NoSQL, command, LDAP, XPath, template (SSTI), header, expression language injection, HTTP request smuggling
 6. **Insecure Design** [A06:2025 | GV.RM] - Missing threat modeling, insecure business flows, missing rate limits on high-value operations, no abuse case testing, trust boundary violations, no re-authentication for sensitive ops, race conditions by design
-7. **Identification and Authentication Failures** [A07:2025 | PR.AA] - Weak passwords, missing brute force protection, session fixation, insecure token generation, missing MFA, credential stuffing gaps, insecure password reset, OAuth state validation
-8. **Software and Data Integrity Failures** [A08:2025 | PR.DS, GV.SC] - Insecure deserialization, CI/CD pipeline injection, missing code signing, auto-update without verification, unsigned webhooks, untrusted data in build pipelines
+7. **Authentication Failures** [A07:2025 | PR.AA] - Weak passwords, missing brute force protection, session fixation, insecure token generation, missing MFA, credential stuffing gaps, insecure password reset, OAuth state validation
+8. **Software or Data Integrity Failures** [A08:2025 | PR.DS, GV.SC] - Insecure deserialization, CI/CD pipeline injection, missing code signing, auto-update without verification, unsigned webhooks, untrusted data in build pipelines
 9. **Security Logging and Alerting Failures** [A09:2025 | DE.CM, DE.AE] - Missing audit logs for auth events, no log integrity protection, insufficient alerting on security events, sensitive data in logs, missing request tracing, no alerting on repeated auth failures, great logging but no alerting
 10. **Mishandling of Exceptional Conditions** [A10:2025 | DE.AE] - Fail-open logic (granting access on error), error messages leaking secrets or stack traces, NULL dereference crashes, unhandled resource exhaustion, missing timeout handling, inconsistent error responses, silent failures masking security events, failing to detect or respond to abnormal conditions
 11. **XSS** [A05:2025 | PR.DS] - Stored, reflected and DOM-based XSS, attribute injection, JavaScript URI schemes
@@ -347,8 +347,8 @@ Save the report to `./security-audit-report.md` in the project root.
 | A04:2025 | Cryptographic Failures | X | 🔴 Needs Attention / ✅ Acceptable |
 | A05:2025 | Injection | X | 🔴 Needs Attention / ✅ Acceptable |
 | A06:2025 | Insecure Design | X | 🔴 Needs Attention / ✅ Acceptable |
-| A07:2025 | Identification and Auth Failures | X | 🔴 Needs Attention / ✅ Acceptable |
-| A08:2025 | Software and Data Integrity Failures | X | 🔴 Needs Attention / ✅ Acceptable |
+| A07:2025 | Authentication Failures | X | 🔴 Needs Attention / ✅ Acceptable |
+| A08:2025 | Software or Data Integrity Failures | X | 🔴 Needs Attention / ✅ Acceptable |
 | A09:2025 | Security Logging and Alerting Failures | X | 🔴 Needs Attention / ✅ Acceptable |
 | A10:2025 | Mishandling of Exceptional Conditions | X | 🔴 Needs Attention / ✅ Acceptable |
 
@@ -362,7 +362,7 @@ Save the report to `./security-audit-report.md` in the project root.
 | ID (Identify) | ID.AM, ID.RA, ID.IM | X | 🔴 Needs Attention / ✅ Acceptable |
 | PR (Protect) | PR.AA, PR.AT, PR.DS, PR.PS, PR.IR | X | 🔴 Needs Attention / ✅ Acceptable |
 | DE (Detect) | DE.CM, DE.AE | X | 🔴 Needs Attention / ✅ Acceptable |
-| RS (Respond) | RS.MA, RS.AN, RS.MI | X | 🔴 Needs Attention / ✅ Acceptable |
+| RS (Respond) | RS.MA, RS.AN, RS.CO, RS.MI | X | 🔴 Needs Attention / ✅ Acceptable |
 | RC (Recover) | RC.RP, RC.CO | X | 🔴 Needs Attention / ✅ Acceptable |
 
 ---
@@ -373,8 +373,8 @@ Save the report to `./security-audit-report.md` in the project root.
 |-----------|----------|---------|
 | CWE | X unique CWEs identified | [list top CWE IDs found] |
 | SANS/CWE Top 25 | X/25 entries found | [list matching entries] |
-| OWASP ASVS 4.0 | X/14 chapters with findings | [list chapters] |
-| PCI DSS 4.0 | X requirements relevant | [list relevant requirements] |
+| OWASP ASVS 5.0 | X/14 chapters with findings | [list chapters] |
+| PCI DSS 4.0.1 | X requirements relevant | [list relevant requirements] |
 | MITRE ATT&CK | X techniques mapped | [list technique IDs] |
 | SOC 2 | X criteria with findings | [list criteria] |
 | ISO 27001:2022 | X controls with findings | [list controls] |
@@ -493,8 +493,8 @@ Save the report to `./security-audit-report.md` in the project root.
 | NIST CSF 2.0 | [functions covered] |
 | CWE | [X unique CWE IDs identified] |
 | SANS/CWE Top 25 | [X/25 matched] (omit if --lite) |
-| ASVS 4.0 | [chapters checked] (omit if --lite) |
-| Additional frameworks | PCI DSS 4.0, MITRE ATT&CK, SOC 2, ISO 27001:2022 (omit if --lite) |
+| ASVS 5.0 | [chapters checked] (omit if --lite) |
+| Additional frameworks | PCI DSS 4.0.1, MITRE ATT&CK, SOC 2, ISO 27001:2022 (omit if --lite) |
 
 ---
 

@@ -22,7 +22,7 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] Batch transaction processing validates each item individually (CWE-20)
 - [ ] Transaction timestamps use server-side UTC, never client-provided times (CWE-345)
 
-## Payment Card Data (PCI DSS) [A04:2025, A01:2025 | PR.DS, PR.AA]
+## Payment Card Data (PCI DSS) [A01:2025, A04:2025 | PR.DS, PR.AA]
 
 - [ ] Primary Account Numbers (PAN) are never stored in plaintext (CWE-312)
 - [ ] PAN is masked in all display contexts (show only last 4 digits) (CWE-200)
@@ -33,14 +33,14 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] Cardholder data environment (CDE) is segmented from other systems (CWE-653)
 - [ ] Payment forms use iframes from PCI-compliant providers (not self-hosted fields) (CWE-319)
 
-## Authentication and Authorization [A07:2025, A01:2025 | PR.AA]
+## Authentication and Authorization [A01:2025, A07:2025 | PR.AA]
 
 - [ ] Multi-factor authentication required for financial transactions above threshold (CWE-308)
 - [ ] Step-up authentication for high-value operations (wire transfers, beneficiary changes) (CWE-306)
 - [ ] Session timeout is aggressive for financial operations (5-15 minutes) (CWE-613)
 - [ ] IP/device change during session triggers re-authentication (CWE-384)
 - [ ] Maker-checker (dual control) for high-value or bulk operations (CWE-862)
-- [ ] API keys for financial operations have granular scopes and IP whitelisting (CWE-285)
+- [ ] API keys for financial operations have granular scopes and IP whitelisting (CWE-862)
 - [ ] Withdrawal and transfer endpoints have separate rate limits from read operations (CWE-770)
 
 ## Fraud Detection [A06:2025, A09:2025 | DE.CM, DE.AE]
@@ -51,7 +51,7 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] Geographic restriction enforcement (blocked countries, unusual locations) (CWE-778)
 - [ ] Real-time alerting on suspicious transaction patterns (CWE-778)
 - [ ] Account takeover detection (credential change + immediate withdrawal) (CWE-778)
-- [ ] Transaction audit trail is immutable and complete (CWE-779)
+- [ ] Transaction audit trail is immutable and complete (CWE-778)
 
 ## Regulatory Compliance [A09:2025 | GV.PO, DE.CM]
 
@@ -59,10 +59,10 @@ Running `/security-audit` without `--pack` already covers general security (OWAS
 - [ ] AML (Anti-Money Laundering) screening on transactions above reporting thresholds (CWE-778)
 - [ ] Suspicious Activity Report (SAR) triggers are documented and automated (CWE-778)
 - [ ] Transaction reporting for regulatory requirements (CTR for >$10K) (CWE-778)
-- [ ] Audit trail retention meets regulatory minimums (5-7 years) (CWE-779)
+- [ ] Audit trail retention meets regulatory minimums (5-7 years) (CWE-778)
 - [ ] Regulatory holds - ability to freeze accounts/transactions on demand (CWE-862)
 
-## Data Protection [A04:2025, A02:2025 | PR.DS, PR.PS]
+## Data Protection [A02:2025, A04:2025 | PR.DS, PR.PS]
 
 - [ ] Financial records encrypted at rest with key rotation (CWE-311)
 - [ ] Account numbers and routing numbers masked in UI and logs (CWE-200)

@@ -1,13 +1,13 @@
 # Compliance Framework Mapping
 
-Cross-reference tables mapping OWASP Top 10:2025 findings to CWE, SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
+Cross-reference tables mapping OWASP Top 10:2025 findings to CWE, SANS/CWE Top 25, OWASP ASVS 5.0, PCI DSS 4.0.1, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
 
 ## Table of Contents
 
 1. [CWE Mapping by OWASP Category](#1-cwe-mapping-by-owasp-category)
-2. [SANS/CWE Top 25 (2024) Coverage](#2-sanscwe-top-25-2024-coverage)
-3. [OWASP ASVS 4.0 Mapping](#3-owasp-asvs-40-mapping)
-4. [PCI DSS 4.0 Mapping](#4-pci-dss-40-mapping)
+2. [SANS/CWE Top 25 (2025) Coverage](#2-sanscwe-top-25-2025-coverage)
+3. [OWASP ASVS 5.0 Mapping](#3-owasp-asvs-50-mapping)
+4. [PCI DSS 4.0.1 Mapping](#4-pci-dss-401-mapping)
 5. [MITRE ATT&CK Mapping](#5-mitre-attck-mapping)
 6. [SOC 2 Trust Service Criteria Mapping](#6-soc-2-trust-service-criteria-mapping)
 7. [ISO 27001:2022 Annex A Mapping](#7-iso-270012022-annex-a-mapping)
@@ -108,7 +108,7 @@ Each OWASP Top 10:2025 category maps to specific Common Weakness Enumeration (CW
 | CWE-841 | Improper Enforcement of Behavioral Workflow | Skippable multi-step flows |
 | CWE-362 | Concurrent Execution Using Shared Resource with Improper Synchronization | Race conditions in business logic |
 
-### A07:2025 Identification and Authentication Failures
+### A07:2025 Authentication Failures
 
 | CWE ID | Name | Common Example |
 |--------|------|----------------|
@@ -124,7 +124,7 @@ Each OWASP Top 10:2025 category maps to specific Common Weakness Enumeration (CW
 | CWE-640 | Weak Password Recovery Mechanism | Predictable reset tokens |
 | CWE-798 | Use of Hard-coded Credentials | Default admin/admin |
 
-### A08:2025 Software and Data Integrity Failures
+### A08:2025 Software or Data Integrity Failures
 
 | CWE ID | Name | Common Example |
 |--------|------|----------------|
@@ -162,7 +162,7 @@ Each OWASP Top 10:2025 category maps to specific Common Weakness Enumeration (CW
 
 ---
 
-## 2. SANS/CWE Top 25 (2024) Coverage
+## 2. SANS/CWE Top 25 (2025) Coverage
 
 The SANS/CWE Top 25 Most Dangerous Software Weaknesses, mapped to OWASP Top 10:2025 categories.
 
@@ -198,9 +198,9 @@ The SANS/CWE Top 25 Most Dangerous Software Weaknesses, mapped to OWASP Top 10:2
 
 ---
 
-## 3. OWASP ASVS 4.0 Mapping
+## 3. OWASP ASVS 5.0 Mapping
 
-The OWASP Application Security Verification Standard (ASVS) 4.0 provides 286 verification requirements across 14 chapters and 3 levels.
+The OWASP Application Security Verification Standard (ASVS) 5.0 provides verification requirements across chapters and 3 levels.
 
 ### Levels
 
@@ -239,7 +239,7 @@ The OWASP Application Security Verification Standard (ASVS) 4.0 provides 286 ver
 
 ---
 
-## 4. PCI DSS 4.0 Mapping
+## 4. PCI DSS 4.0.1 Mapping
 
 Payment Card Industry Data Security Standard 4.0 requirements relevant to application security audits.
 
@@ -261,7 +261,7 @@ Payment Card Industry Data Security Standard 4.0 requirements relevant to applic
 | 11.3-11.4 | Test Security Regularly | A02:2025, A03:2025 | Vulnerability scanning, penetration testing |
 | 12.3 | Risks Formally Identified and Managed | A06:2025 | Risk assessment, targeted risk analysis |
 
-### PCI DSS 4.0 Requirement 6.2 Secure Development Checklist
+### PCI DSS 4.0.1 Requirement 6.2 Secure Development Checklist
 
 These requirements directly map to code-level findings:
 
@@ -426,7 +426,7 @@ ISO/IEC 27001:2022 Annex A controls relevant to application security findings.
 
 Quick lookup: given an OWASP Top 10:2025 category, find the corresponding references in all frameworks.
 
-| OWASP 2025 | Top CWEs | SANS Top 25 | ASVS | PCI DSS 4.0 | ATT&CK | SOC 2 | ISO 27001 |
+| OWASP 2025 | Top CWEs | SANS Top 25 | ASVS | PCI DSS 4.0.1 | ATT&CK | SOC 2 | ISO 27001 |
 |------------|----------|-------------|------|-------------|--------|-------|-----------|
 | A01:2025 | CWE-862, CWE-863, CWE-639, CWE-352, CWE-918 | #4,#5,#9,#15,#17,#18,#19 | V4, V12, V13 | 7.2, 7.3 | T1190, T1068, T1530 | CC6.1, CC6.6 | A.5.15, A.8.2, A.8.3 |
 | A02:2025 | CWE-16, CWE-611, CWE-942 | - | V14 | 2.2, 11.3 | T1078.001, T1133 | CC6.6, A1.2 | A.8.4, A.8.9, A.8.31 |

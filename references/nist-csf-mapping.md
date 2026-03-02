@@ -12,8 +12,8 @@ This reference maps audit findings to both NIST CSF 2.0 and OWASP Top 10:2025.
 | A04:2025 | Cryptographic Failures | PR.DS | PR.PS |
 | A05:2025 | Injection | PR.DS | DE.CM, PR.PS |
 | A06:2025 | Insecure Design | GV.RM | GV.RR, ID.RA |
-| A07:2025 | Identification and Auth Failures | PR.AA | PR.DS, DE.CM |
-| A08:2025 | Software and Data Integrity Failures | PR.DS | GV.SC, PR.PS |
+| A07:2025 | Authentication Failures | PR.AA | PR.DS, DE.CM |
+| A08:2025 | Software or Data Integrity Failures | PR.DS | GV.SC, PR.PS |
 | A09:2025 | Security Logging and Alerting Failures | DE.CM | DE.AE, RS.MA |
 | A10:2025 | Mishandling of Exceptional Conditions | DE.AE | PR.DS, PR.IR, RS.MA |
 
@@ -61,6 +61,7 @@ This reference maps audit findings to both NIST CSF 2.0 and OWASP Top 10:2025.
 |----------|------|-------|-------------|
 | Incident Management | RS.MA | A09:2025, A10:2025 | Managing incident responses |
 | Incident Analysis | RS.AN | A09:2025 | Investigation for effective response |
+| Incident Response Reporting | RS.CO | A09:2025 | Coordinating response with stakeholders |
 | Incident Mitigation | RS.MI | A01:2025 | Preventing expansion of events |
 
 ### RC - Recover
@@ -147,7 +148,7 @@ This reference maps audit findings to both NIST CSF 2.0 and OWASP Top 10:2025.
 | No input validation layer | A06:2025 | GV.RM | PR.DS |
 | Business logic flaws | A06:2025 | GV.RM | DE.AE |
 
-### A07:2025 - Identification and Authentication Failures
+### A07:2025 - Authentication Failures
 
 | Finding Type | OWASP | NIST Primary | NIST Secondary |
 |-------------|-------|-------------|---------------|
@@ -157,7 +158,7 @@ This reference maps audit findings to both NIST CSF 2.0 and OWASP Top 10:2025.
 | Insecure password reset | A07:2025 | PR.AA | PR.DS |
 | OAuth state missing | A07:2025 | PR.AA | PR.DS |
 
-### A08:2025 - Software and Data Integrity Failures
+### A08:2025 - Software or Data Integrity Failures
 
 | Finding Type | OWASP | NIST Primary | NIST Secondary |
 |-------------|-------|-------------|---------------|
