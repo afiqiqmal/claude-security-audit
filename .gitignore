@@ -1,3 +1,7 @@
 .DS_Store
 security-audit-report.md
 security-audit-report.pdf
+security-audit-report.sarif
+security-audit-report.json
+security-audit-triage.md
+.security-audit-baseline.json

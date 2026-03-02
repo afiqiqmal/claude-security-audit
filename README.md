@@ -13,12 +13,20 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **White-Box Testing** - 20 attack categories with 475+ individual checks
 - **AI/LLM Security** - Prompt injection, output sanitization, RAG poisoning, cost monitoring, tool calling permissions
 - **Diff Mode** - Scan only git-changed files for fast PR-level reviews
+- **Recheck Mode** - Re-audit specific files or directories after fixes
 - **Gray-Box Testing** - Role-based access probing, API endpoint testing, credential boundary checks, error differential analysis
 - **Security Hotspots** - Flags sensitive code that needs careful review during PRs
 - **Code Smells** - Quality patterns that breed security bugs
-- **Framework Detection** - Tailored checks for Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go and Flask
+- **Multi-Framework Detection** - Auto-detects and loads checks for up to 3 frameworks (Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go, Flask)
 - **Findings First** - Shows findings by default, append `--fix` to include remediation code blocks
 - **Lite Mode** - Append `--lite` to reduce token usage (OWASP + CWE + NIST only, skips extra compliance mapping)
+- **CI Gating** - `--fail-on` flag outputs machine-readable PASS/FAIL for CI/CD pipelines
+- **SARIF/JSON Output** - `--format sarif` for GitHub Advanced Security, `--format json` for custom tooling
+- **Baseline Suppression** - `--update-baseline` tracks known findings across audit runs
+- **Report Diff** - `--diff-report` compares with previous audits to show new, resolved and changed findings
+- **Triage Mode** - Interactive walkthrough to Accept, Defer, Dismiss or Escalate each finding
+- **Compliance Packs** - `--pack` loads HIPAA, GDPR, fintech or SaaS multi-tenant checks
+- **Scope Exclusions** - `.security-audit-ignore` file to skip files and directories
 - **Custom Checks** - Add your own `.md` checklists globally or per-project
 - **Phase Control** - Run individual phases (recon, white-box, gray-box, hotspots, smells) independently
 - **Multiple Modes** - Full audit, quick scan, gray-box only, focused deep dives or single phases
@@ -36,18 +44,24 @@ claude-security-audit/
 │   ├── attack-vectors.md           # 475+ security checks (OWASP 2025 + NIST + CWE tagged)
 │   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
 │   ├── compliance-mapping.md       # CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001
+│   ├── features-extended.md        # Baseline, SARIF/JSON, report diff, triage specs
 │   ├── custom-template.md          # Template for custom checks
-│   └── frameworks/                 # Framework-specific checklists
-│       ├── laravel.md
-│       ├── nextjs.md
-│       ├── fastapi.md
-│       ├── express.md
-│       ├── django.md
-│       ├── rails.md
-│       ├── spring-boot.md
-│       ├── aspnet-core.md
-│       ├── go.md
-│       └── flask.md
+│   ├── frameworks/                 # Framework-specific checklists
+│   │   ├── laravel.md
+│   │   ├── nextjs.md
+│   │   ├── fastapi.md
+│   │   ├── express.md
+│   │   ├── django.md
+│   │   ├── rails.md
+│   │   ├── spring-boot.md
+│   │   ├── aspnet-core.md
+│   │   ├── go.md
+│   │   └── flask.md
+│   └── packs/                      # Compliance check packs
+│       ├── hipaa.md
+│       ├── gdpr.md
+│       ├── fintech.md
+│       └── saas-multi-tenant.md
 ├── security-audit-guidelines.md    # Severity ratings, conventions, framework detection
 ├── install.sh                      # One-command installer
 ├── CLAUDE.md                       # Project context for Claude Code
@@ -94,7 +108,9 @@ Removes the command file, reference files, custom checks folder and guidelines.
 | `attack-vectors.md` | `~/.claude/security-audit-references/` | 475+ OWASP 2025/NIST/CWE-tagged security checks |
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
 | `compliance-mapping.md` | `~/.claude/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
+| `features-extended.md` | `~/.claude/security-audit-references/` | Baseline, SARIF/JSON, report diff and triage specs |
 | `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 10 framework-specific checklists |
+| `packs/*.md` | `~/.claude/security-audit-references/packs/` | 4 compliance check packs (HIPAA, GDPR, fintech, SaaS) |
 | `custom-template.md` | `~/.claude/security-audit-custom/` | Template for writing custom checks |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
 
@@ -120,6 +136,13 @@ Removes the command file, reference files, custom checks folder and guidelines.
 /security-audit focus:api      # API security and input validation
 /security-audit focus:config   # Configuration, supply chain, infrastructure
 
+# Re-audit specific paths after fixing
+/security-audit recheck:src/auth           # Single path
+/security-audit recheck:src/auth,src/api   # Multiple paths
+
+# Interactive triage of existing findings
+/security-audit triage
+
 # Run individual phases
 /security-audit phase:1        # Reconnaissance only
 /security-audit phase:2        # White-box analysis only
@@ -136,6 +159,29 @@ Removes the command file, reference files, custom checks folder and guidelines.
 /security-audit --lite         # Full audit without extra compliance mapping
 /security-audit quick --lite   # Cheapest useful scan
 /security-audit diff:main --lite --fix
+
+# CI gating - fail if findings at or above threshold
+/security-audit diff:main --fail-on high
+/security-audit full --fail-on critical
+
+# Structured output (alongside markdown)
+/security-audit --format sarif       # SARIF v2.1.0 for GitHub Advanced Security
+/security-audit --format json        # JSON for custom tooling
+
+# Baseline tracking
+/security-audit --update-baseline    # Save current findings as baseline
+/security-audit full                 # Future runs auto-tag known findings
+
+# Compare with previous report
+/security-audit --diff-report ./previous-report.md
+
+# Compliance packs
+/security-audit --pack hipaa                    # HIPAA checks
+/security-audit --pack gdpr --pack fintech      # Multiple packs
+/security-audit --pack saas-multi-tenant
+
+# Combine everything
+/security-audit diff:main --lite --fix --fail-on high --pack hipaa
 ```
 
 By default, the report shows findings only (vulnerable code, impact and a text description of what to fix). Append `--fix` to include copy-paste-ready remediation code blocks. Append `--lite` to skip SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping and reduce token usage.
@@ -143,6 +189,15 @@ By default, the report shows findings only (vulnerable code, impact and a text d
 ### Output
 
 Report saves to `./security-audit-report.md` in your project root. If a PDF converter is installed, it also saves `./security-audit-report.pdf`.
+
+| Output File | When Generated |
+|------------|----------------|
+| `security-audit-report.md` | Always (primary report) |
+| `security-audit-report.pdf` | When a PDF converter is installed |
+| `security-audit-report.sarif` | With `--format sarif` |
+| `security-audit-report.json` | With `--format json` |
+| `security-audit-triage.md` | After running `triage` mode |
+| `.security-audit-baseline.json` | With `--update-baseline` |
 
 Supported PDF converters (checked in order):
 
@@ -164,25 +219,30 @@ This audit is **token-intensive**. Claude reads the command file, reference file
 |------|-------------------|---------------|---------------|-----------------|
 | `quick --lite` | ~9K tokens | ~20-60K | ~5-15K | **~35-85K tokens** |
 | `diff --lite` | ~9K tokens | ~5-20K | ~5-15K | **~20-45K tokens** |
+| `recheck:path` | ~19K tokens | ~5-20K | ~5-15K | **~30-55K tokens** |
 | `quick` | ~19K tokens | ~20-60K | ~10-25K | **~50-105K tokens** |
 | `focus:auth` | ~15K tokens | ~15-40K | ~10-20K | **~40-75K tokens** |
 | `diff` | ~19K tokens | ~5-20K | ~10-20K | **~35-60K tokens** |
 | `full --lite` | ~19K tokens | ~40-120K | ~15-30K | **~75-170K tokens** |
 | `full` | ~29K tokens | ~40-120K | ~20-40K | **~90-190K tokens** |
 | `full --fix` | ~29K tokens | ~40-120K | ~30-60K | **~100-210K tokens** |
+| `full --pack hipaa` | ~31K tokens | ~40-120K | ~25-45K | **~95-195K tokens** |
+| `triage` | ~10K tokens | ~0K | ~5-10K | **~15-20K tokens** |
 
 **Reference overhead breakdown** (tokens loaded before scanning starts):
 
 | File | Tokens | Loaded In |
 |------|--------|-----------|
-| Command file (always loaded) | ~7K | All modes |
-| `attack-vectors.md` | ~10K | `full`, `diff`, `phase:2` (skipped in `quick`) |
+| Command file (always loaded) | ~9K | All modes |
+| `attack-vectors.md` | ~10K | `full`, `diff`, `recheck`, `phase:2` (skipped in `quick`) |
 | `compliance-mapping.md` | ~7K | `full` only (skipped with `--lite`) |
 | `nist-csf-mapping.md` | ~3K | `full`, `phase:2` (skipped with `--lite`) |
 | `guidelines.md` | ~2K | All modes |
-| Framework file (1 of 10) | ~1K | When framework detected |
+| Framework file (up to 3) | ~1K each | When framework detected |
+| `features-extended.md` | ~3K | When `--format`, `--update-baseline`, `--diff-report` or `triage` used |
+| Pack file (each) | ~1K | When `--pack` used |
 
-Codebase scan tokens depend on your project size. A small project (10-20 files) uses ~20K scan tokens while a large project (200+ files) can use 100K+. The `diff` and `focus` modes significantly reduce scan tokens by limiting scope. Adding `--fix` increases report output by roughly 50% due to remediation code blocks.
+Codebase scan tokens depend on your project size. A small project (10-20 files) uses ~20K scan tokens while a large project (200+ files) can use 100K+. The `diff`, `focus` and `recheck` modes significantly reduce scan tokens by limiting scope. Adding `--fix` increases report output by roughly 50% due to remediation code blocks. Compliance packs add ~1K tokens each.
 
 **To minimize costs**: use `quick --lite` for fast checks, `diff --lite` for PR reviews and reserve `full` for thorough audits.
 
@@ -210,6 +270,148 @@ Organize checks under headings with OWASP and NIST tags:
 ```
 
 Custom checks are loaded during Phase 1 (reconnaissance) and run as additional checklists during Phase 2 (white-box analysis). Both global and project-level checks are merged - project-level checks do not override global ones.
+
+## Scope Exclusions
+
+Create a `.security-audit-ignore` file in your project root to exclude files and directories from the audit:
+
+```
+# Dependencies (already covered by dependency audit tools)
+vendor/
+node_modules/
+.venv/
+
+# Build artifacts
+dist/
+build/
+*.min.js
+
+# Test fixtures with intentionally vulnerable code
+tests/fixtures/
+
+# Negate to include a specific file
+!tests/fixtures/auth-test.php
+```
+
+Format follows gitignore conventions: one pattern per line, `#` for comments, `!` for negation. Exclusions apply to all audit phases.
+
+## Compliance Packs
+
+Load compliance-specific checklists with `--pack`:
+
+| Pack | Checks | Focus Areas |
+|------|--------|-------------|
+| `hipaa` | 35 | PHI protection, access controls, audit trails, BAA requirements, breach notification |
+| `gdpr` | 38 | Consent, data subject rights, data protection by design, international transfers |
+| `fintech` | 40 | Transaction security, PCI DSS, fraud detection, KYC/AML, regulatory compliance |
+| `saas-multi-tenant` | 42 | Tenant isolation, cross-tenant vulnerabilities, resource limits, administration |
+
+```bash
+/security-audit --pack hipaa                    # Single pack
+/security-audit --pack gdpr --pack fintech      # Multiple packs
+/security-audit full --pack saas-multi-tenant --fix
+```
+
+Packs are loaded during Phase 1 and run as additional checklists during Phase 2, the same mechanism as custom checks. Pack findings include OWASP, CWE and NIST tags.
+
+## CI/CD Integration
+
+### GitHub Actions
+
+Use `--fail-on` and `diff` mode for automated PR security checks:
+
+```yaml
+name: Security Audit
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run security audit
+        run: |
+          claude /security-audit "diff:main --lite --fail-on high"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report
+          path: |
+            security-audit-report.md
+            security-audit-report.sarif
+```
+
+The `--fail-on` flag outputs a machine-readable line at the end of the audit:
+
+```
+SECURITY_AUDIT_EXIT: PASS
+SECURITY_AUDIT_EXIT: FAIL (3 findings at or above HIGH)
+```
+
+Threshold levels: `critical` (only CRITICAL), `high` (CRITICAL + HIGH), `medium` (CRITICAL + HIGH + MEDIUM).
+
+### SARIF Integration
+
+Use `--format sarif` to upload results to GitHub Advanced Security:
+
+```yaml
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: security-audit-report.sarif
+```
+
+## Baseline Tracking
+
+Track known findings across audit runs with `--update-baseline`:
+
+```bash
+# First run - establish baseline
+/security-audit full --update-baseline
+
+# Future runs - new findings are highlighted, known findings tagged [Known]
+/security-audit full
+```
+
+The baseline file (`.security-audit-baseline.json`) stores fingerprints of each finding. On subsequent runs, findings matching the baseline appear with a `[Known]` badge and a "New since baseline" count is added to the Executive Summary. Commit the baseline file to track security posture over time.
+
+## Report Diff
+
+Compare the current audit with a previous report to see what changed:
+
+```bash
+# Save current report, then run again later
+/security-audit full --diff-report ./previous-report.md
+```
+
+Adds a "Changes Since Previous Audit" section showing:
+- **New findings** - issues found in the current audit but not in the previous one
+- **Resolved findings** - issues from the previous audit that no longer appear
+- **Changed severity** - same finding with a different severity level
+
+## Triage Mode
+
+After running an audit, use triage mode to categorize each finding:
+
+```bash
+/security-audit triage
+```
+
+Walks through each finding (ordered by severity) and asks the developer to:
+- **Accept** - Will fix this finding
+- **Defer** - Known risk, accepted for now (with reason)
+- **Dismiss** - False positive or not applicable (with reason)
+- **Escalate** - Needs team review or architect decision
+
+Results are saved to `./security-audit-triage.md`. This is useful for tracking team decisions on which findings to address and which to accept as known risks.
 
 ## OWASP Top 10:2025 Coverage
 

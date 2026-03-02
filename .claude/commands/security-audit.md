@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(bundle:*), Bash(govulncheck:*), Bash(dotnet:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*), Bash(which:*), Bash(pandoc:*), Bash(wkhtmltopdf:*), Bash(weasyprint:*), Bash(md-to-pdf:*), Bash(mdpdf:*)
 description: Run a comprehensive white-box and gray-box security audit with OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping. Shows findings by default. Append --fix to include remediation code blocks.
-argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config|phase:1|phase:2|phase:3|phase:4|phase:5] [--fix] [--lite]"
+argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config|phase:1-5|recheck:path|triage] [--fix] [--lite] [--fail-on critical|high|medium] [--format sarif|json] [--update-baseline] [--diff-report path] [--pack name]"
 ---
 
 # Security Audit Command
@@ -19,6 +19,8 @@ Based on `$ARGUMENTS`:
 - **focus:config** - Deep dive on configuration, supply chain and infrastructure (Phase 1 + Phase 2 categories A02, A03, A08 + Phase 4 config hotspots only)
 - **diff** - Scan only files changed since last commit (`git diff HEAD`), skip gray-box and smells (Phases 0, 1, 2, 4)
 - **diff:BRANCH** - Scan only files changed compared to a branch (e.g., `diff:main`), skip gray-box and smells (Phases 0, 1, 2, 4)
+- **recheck:PATH** - Re-audit specific files or directories (e.g., `recheck:src/auth` or `recheck:src/auth,src/api`). Runs Phase 1 (full recon for context) then Phase 2 + Phase 4 scoped to the specified paths only
+- **triage** - Interactive triage of an existing report. Requires `./security-audit-report.md` to exist. Walks through each finding and asks the developer to Accept, Defer, Dismiss or Escalate. Outputs `./security-audit-triage.md`
 - **phase:1** - Reconnaissance only - map project structure, tech stack, entry points, data flow and custom checks
 - **phase:2** - White-box analysis only - run all 20 attack categories against the full codebase
 - **phase:3** - Gray-box testing only - role-based access, API probing, credential boundaries, rate limits, error differentials
@@ -39,7 +41,49 @@ Append `--lite` to any mode to reduce token usage. Lite mode:
 - Omits the Compliance Coverage table from the report
 - Uses inline category summaries instead of reading `attack-vectors.md` for `quick` mode
 
-Combine flags freely: `/security-audit quick --lite`, `/security-audit diff:main --lite --fix`
+### Fail-On Flag (CI Gating)
+
+Append `--fail-on critical`, `--fail-on high` or `--fail-on medium` to any mode. After report generation, count findings at or above the threshold severity. Output a machine-readable exit summary line at the very end:
+
+```
+SECURITY_AUDIT_EXIT: PASS|FAIL (X findings at or above THRESHOLD)
+```
+
+Example: `--fail-on high` fails if any CRITICAL or HIGH findings exist.
+
+### Format Flag
+
+Append `--format sarif` or `--format json` to generate a structured output file alongside the markdown report:
+- `--format sarif` - SARIF v2.1.0 for GitHub Advanced Security (saves to `./security-audit-report.sarif`)
+- `--format json` - Structured JSON for custom tooling (saves to `./security-audit-report.json`)
+
+The markdown report is always generated. Read `~/.claude/security-audit-references/features-extended.md` for the SARIF/JSON schema details.
+
+### Update Baseline Flag
+
+Append `--update-baseline` to write all current finding fingerprints to `.security-audit-baseline.json` after the audit completes. On subsequent runs (without `--update-baseline`), if a baseline file exists, findings that match the baseline are tagged `[Known]` in the report and a "New since baseline" count is added to the Executive Summary.
+
+Read `~/.claude/security-audit-references/features-extended.md` for baseline format and fingerprint calculation details.
+
+### Diff Report Flag
+
+Append `--diff-report ./previous-report.md` to compare the new report with a previous one. Adds a "Changes Since Previous Audit" section after the Executive Summary showing new findings, resolved findings and changed severity.
+
+Read `~/.claude/security-audit-references/features-extended.md` for matching logic and report section format.
+
+### Pack Flag
+
+Append `--pack name` to load additional compliance-specific checklists during Phase 2. Multiple packs can be combined: `--pack hipaa --pack gdpr`.
+
+Available packs:
+- `hipaa` - HIPAA compliance checks for applications handling PHI
+- `gdpr` - GDPR compliance checks for EU personal data
+- `fintech` - Financial services, transaction security and PCI DSS checks
+- `saas-multi-tenant` - Multi-tenant isolation, cross-tenant security and resource limits
+
+Pack files are in `~/.claude/security-audit-references/packs/`. They follow the same format as custom checks.
+
+Combine flags freely: `/security-audit quick --lite`, `/security-audit diff:main --lite --fix`, `/security-audit full --fail-on high --pack hipaa`
 
 ## Framework Mapping
 
@@ -87,10 +131,12 @@ Load reference files **conditionally** to minimize token usage. Do NOT read file
 
 | Reference File | When to Read |
 |---------------|-------------|
-| `attack-vectors.md` | `full`, `diff`, `phase:2` modes. Skip for `quick` (use inline summaries above). For `focus` modes, read only the relevant sections. |
+| `attack-vectors.md` | `full`, `diff`, `recheck`, `phase:2` modes. Skip for `quick` (use inline summaries above). For `focus` modes, read only the relevant sections. |
 | `nist-csf-mapping.md` | `full` and `phase:2` modes only. Skip if `--lite`. |
 | `compliance-mapping.md` | `full` mode only. Skip if `--lite`. Not needed for `quick`, `diff`, `focus` or `phase` modes. |
-| `frameworks/*.md` | Read only the matching framework file after detecting the tech stack in Phase 1. Read at most one file. |
+| `frameworks/*.md` | Read matching framework files after detecting the tech stack in Phase 1. Read up to 3 files for multi-framework projects. |
+| `features-extended.md` | Read when `--format sarif`, `--format json`, `--update-baseline`, `--diff-report` or `triage` mode is used. |
+| `packs/*.md` | Read only the pack files specified by `--pack` flags. |
 | Custom check `.md` files | Read during Phase 1 if the folders exist. |
 
 All reference files are in `~/.claude/security-audit-references/`.
@@ -113,17 +159,21 @@ If `$ARGUMENTS` starts with `diff`:
 
 ### Phase 1: Reconnaissance [NIST: ID | OWASP: all]
 
-1. Map the project structure - list all directories, identify frameworks and languages
-2. Identify the tech stack - framework version, ORM, auth library, session handling, template engine, API style, job queues, caching
-3. Find all entry points - routes, controllers, API endpoints, middleware, CLI commands, queue workers, webhooks
-4. Trace data flow - where does user input enter, get stored, get rendered or returned?
-5. Check configuration files - `.env`, `config/`, `docker-compose.yml`, CI/CD pipelines
-6. Identify user roles and permission levels defined in the system
-7. Load custom checks - read all `.md` files from `~/.claude/security-audit-custom/` and `.claude/security-audit-custom/` if either folder exists. Treat each file as an additional checklist to run during Phase 2
+1. **Scope exclusions** - Check for `.security-audit-ignore` in the project root. If it exists, read it and apply gitignore-style patterns to exclude matching files and directories from all subsequent phases. Format: one pattern per line, `#` for comments, `!` prefix for negation. Example patterns: `vendor/`, `node_modules/`, `*.min.js`, `tests/fixtures/`
+2. Map the project structure - list all directories, identify frameworks and languages
+3. Identify the tech stack - framework version, ORM, auth library, session handling, template engine, API style, job queues, caching
+4. **Multi-framework detection** - Detect all frameworks in the project (not just the first match). Read up to 3 matching framework reference files from `~/.claude/security-audit-references/frameworks/`. List all detected frameworks in the report Methodology section
+5. Find all entry points - routes, controllers, API endpoints, middleware, CLI commands, queue workers, webhooks
+6. Trace data flow - where does user input enter, get stored, get rendered or returned?
+7. Check configuration files - `.env`, `config/`, `docker-compose.yml`, CI/CD pipelines
+8. Identify user roles and permission levels defined in the system
+9. Load custom checks - read all `.md` files from `~/.claude/security-audit-custom/` and `.claude/security-audit-custom/` if either folder exists. Treat each file as an additional checklist to run during Phase 2
+10. **Load pack checks** - if `--pack` flags are set, read the matching pack files from `~/.claude/security-audit-references/packs/`. Treat each pack as an additional checklist to run during Phase 2
+11. **Recheck scoping** - if mode is `recheck:PATH`, store the specified path(s) (comma-separated). All Phase 2 and Phase 4 checks will scan ONLY the specified paths, while Phase 1 runs fully for context
 
 ### Phase 2: White-Box Attack Surface Analysis [NIST: ID + PR]
 
-For `full`, `diff` and `phase:2` modes: read `~/.claude/security-audit-references/attack-vectors.md` for the detailed checklist.
+For `full`, `diff`, `recheck` and `phase:2` modes: read `~/.claude/security-audit-references/attack-vectors.md` for the detailed checklist.
 For `focus` modes: read only the relevant sections of `attack-vectors.md`:
 - `focus:auth` - sections 1 (Broken Access Control) and 7 (Identification and Authentication Failures)
 - `focus:api` - sections 1 (Broken Access Control), 5 (Injection), 6 (Insecure Design) and 14 (API Security)
@@ -211,7 +261,7 @@ For each gray-box finding, include:
 
 ### Phase 4: Security Hotspots [NIST: ID + GV | OWASP: A06:2025]
 
-(Skip in `quick` and `gray` modes. Run in `full`, `diff`, `focus` and `phase:4` modes.)
+(Skip in `quick` and `gray` modes. Run in `full`, `diff`, `recheck`, `focus` and `phase:4` modes.)
 
 Flag sensitive code areas that are not vulnerable today but would break if modified carelessly:
 
@@ -262,7 +312,7 @@ Save the report to `./security-audit-report.md` in the project root.
 **Date**: [today's date]
 **Auditor**: Claude Security Audit
 **Frameworks**: OWASP Top 10:2025 + NIST CSF 2.0
-**Mode**: [full/quick/gray/focus:X/diff/phase:X]
+**Mode**: [full/quick/gray/focus:X/diff/recheck:X/phase:X/triage]
 
 ---
 
@@ -279,6 +329,7 @@ Save the report to `./security-audit-report.md` in the project root.
 | 📍 Security hotspots | X |
 | 🧹 Code smells | X |
 | **Total findings** | **X** |
+| New since baseline | X | (only if `.security-audit-baseline.json` exists)
 
 **Overall Risk Assessment**: [sentence summary]
 
@@ -428,10 +479,14 @@ Save the report to `./security-audit-report.md` in the project root.
 | Aspect | Details |
 |--------|---------|
 | Phases executed | [list phases run, e.g., 1-5 for full, 1-2 for quick] |
+| Frameworks detected | [list all detected frameworks] |
 | White-box categories | [categories checked] |
 | Gray-box testing | [roles tested, endpoints probed] |
 | Security hotspots | [count and sensitivity categories scanned] |
 | Code smells | [structural, data handling, error handling, dependencies, design] |
+| Packs loaded | [list pack names, or "none"] |
+| Scope exclusions | [yes/no - patterns from `.security-audit-ignore`] |
+| Baseline comparison | [yes/no - `.security-audit-baseline.json`] |
 | OWASP Top 10:2025 | [X/10 categories covered] |
 | NIST CSF 2.0 | [functions covered] |
 | CWE | [X unique CWE IDs identified] |
@@ -487,6 +542,65 @@ Tell the developer:
 
 If `--fix` was NOT used, also tell the developer:
 > To generate the report again with code fixes included, run: `/security-audit [mode] --fix`
+
+### Triage Mode Behavior
+
+When mode is `triage`:
+1. Skip all audit phases (1-5). Do NOT scan code or generate findings.
+2. Read the existing `./security-audit-report.md` file. If it does not exist, tell the developer and stop.
+3. Read `~/.claude/security-audit-references/features-extended.md` for the triage flow specification.
+4. Parse all findings from the existing report (CRITICAL, HIGH, MEDIUM, LOW, INFO, GRAY, HOTSPOT, SMELL).
+5. For each finding (ordered by severity, CRITICAL first), present the finding summary and ask the developer to: **Accept** (will fix), **Defer** (known risk), **Dismiss** (false positive) or **Escalate** (needs review).
+6. For Defer and Dismiss, ask for a one-line reason.
+7. Save results to `./security-audit-triage.md` using the format in `features-extended.md`.
+8. Skip PDF conversion and all other post-report steps.
+
+### Recheck Mode Behavior
+
+When mode is `recheck:PATH`:
+1. Parse the path(s) from the argument. Multiple paths are comma-separated: `recheck:src/auth,src/api`
+2. Run Phase 1 fully (reconnaissance for context)
+3. Run Phase 2 (white-box) scoped to ONLY the specified paths
+4. Run Phase 4 (hotspots) scoped to ONLY the specified paths
+5. Skip Phase 3 (gray-box) and Phase 5 (smells)
+6. In the report Methodology, note which paths were re-checked
+
+### Baseline Processing (after report generation)
+
+If `--update-baseline` is set:
+1. Read `~/.claude/security-audit-references/features-extended.md` for baseline format
+2. Collect all findings from the generated report
+3. Compute fingerprints per the specification in `features-extended.md`
+4. Write `.security-audit-baseline.json` to the project root
+5. Tell the developer: `Baseline updated with X findings.`
+
+If `--update-baseline` is NOT set but `.security-audit-baseline.json` exists:
+1. Read the baseline file
+2. For each finding, check if its fingerprint matches a baseline entry
+3. Tag matching findings with `[Known]` in the report
+4. Add "New since baseline" count to the Executive Summary
+
+### SARIF/JSON Output (after report generation)
+
+If `--format sarif` or `--format json` is set:
+1. Read `~/.claude/security-audit-references/features-extended.md` for the schema specification
+2. Transform all findings into the target format
+3. Save to `./security-audit-report.sarif` or `./security-audit-report.json`
+4. Tell the developer where the file was saved
+
+### Report Diff (after report generation)
+
+If `--diff-report path` is set:
+1. Read `~/.claude/security-audit-references/features-extended.md` for matching logic
+2. Read the previous report at the specified path
+3. Compare findings between reports
+4. Insert a "Changes Since Previous Audit" section after the Executive Summary in the new report
+
+### CI Gating (after all other post-report steps)
+
+If `--fail-on` is set:
+1. Count findings at or above the threshold severity (e.g., `--fail-on high` counts CRITICAL + HIGH)
+2. Output the exit summary line as the very last output: `SECURITY_AUDIT_EXIT: PASS` or `SECURITY_AUDIT_EXIT: FAIL (X findings at or above THRESHOLD)`
 
 ### PDF Conversion (automatic)
 

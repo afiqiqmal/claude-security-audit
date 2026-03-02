@@ -134,6 +134,36 @@ else
     FAILED=$((FAILED + 1))
 fi
 
+# Install features-extended reference
+if install_file "references/features-extended.md" "$REFERENCES_DIR/features-extended.md"; then
+    echo -e "  ${GREEN}✓${NC} features-extended.md reference"
+    INSTALLED=$((INSTALLED + 1))
+else
+    echo -e "  ${RED}✗${NC} features-extended.md reference"
+    FAILED=$((FAILED + 1))
+fi
+
+# Install compliance pack files
+PACKS="hipaa gdpr fintech saas-multi-tenant"
+PACK_FAILED=0
+PACK_INSTALLED=0
+
+for pack in $PACKS; do
+    if install_file "references/packs/${pack}.md" "$REFERENCES_DIR/packs/${pack}.md"; then
+        PACK_INSTALLED=$((PACK_INSTALLED + 1))
+    else
+        PACK_FAILED=$((PACK_FAILED + 1))
+    fi
+done
+
+if [ $PACK_FAILED -eq 0 ]; then
+    echo -e "  ${GREEN}✓${NC} compliance packs (${PACK_INSTALLED} packs)"
+    INSTALLED=$((INSTALLED + 1))
+else
+    echo -e "  ${YELLOW}~${NC} compliance packs (${PACK_INSTALLED}/$((PACK_INSTALLED + PACK_FAILED)))"
+    INSTALLED=$((INSTALLED + 1))
+fi
+
 # Install framework reference files
 FRAMEWORKS="laravel nextjs fastapi express django rails spring-boot aspnet-core go flask"
 FRAMEWORK_FAILED=0
@@ -195,6 +225,7 @@ echo ""
 echo -e "Installed to:"
 echo -e "  Command:    ${BLUE}$COMMANDS_DIR/security-audit.md${NC}"
 echo -e "  References: ${BLUE}$REFERENCES_DIR/${NC}"
+echo -e "  Packs:      ${BLUE}$REFERENCES_DIR/packs/${NC}"
 echo -e "  Custom:     ${BLUE}$CUSTOM_DIR/${NC}"
 echo -e "  Guidelines: ${BLUE}$GUIDELINES_DIR/security-audit-guidelines.md${NC}"
 echo ""
@@ -208,6 +239,8 @@ echo "  /security-audit gray         Gray-box testing only"
 echo "  /security-audit focus:auth   Authentication and authorization deep dive"
 echo "  /security-audit focus:api    API security deep dive"
 echo "  /security-audit focus:config Configuration and infrastructure deep dive"
+echo "  /security-audit recheck:src/auth  Re-audit specific paths"
+echo "  /security-audit triage       Interactive finding triage"
 echo ""
 echo "  /security-audit phase:1     Reconnaissance only"
 echo "  /security-audit phase:2     White-box analysis only"
@@ -222,6 +255,13 @@ echo ""
 echo "  Append --lite to reduce token usage (OWASP + CWE + NIST only):"
 echo "  /security-audit --lite       Full audit without extra compliance mapping"
 echo "  /security-audit quick --lite Cheapest useful scan"
+echo ""
+echo "  Additional flags:"
+echo "  --fail-on critical|high|medium   CI gating with PASS/FAIL exit line"
+echo "  --format sarif|json              Structured output (GitHub/custom)"
+echo "  --update-baseline                Save finding fingerprints for tracking"
+echo "  --diff-report ./prev-report.md   Compare with previous report"
+echo "  --pack hipaa|gdpr|fintech|saas-multi-tenant  Compliance packs"
 echo ""
 echo "Report will be saved to ./security-audit-report.md in your project root."
 echo ""
