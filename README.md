@@ -25,7 +25,7 @@ claude-security-audit/
 │   └── commands/
 │       └── security-audit.md       # /security-audit slash command
 ├── references/
-│   ├── attack-vectors.md           # 500+ security checks (OWASP 2025 + NIST tagged)
+│   ├── attack-vectors.md           # 850+ security checks (OWASP 2025 + NIST tagged)
 │   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
 │   └── frameworks/                 # Framework-specific checklists
 │       ├── laravel.md

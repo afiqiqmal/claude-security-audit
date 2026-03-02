@@ -81,6 +81,10 @@ Global security audit standards for Claude Code projects. Defines the methodolog
 | `go.mod` + `gin` or `echo` or `fiber` | Go (Gin/Echo/Fiber) | `text/template` vs `html/template`, `os/exec`, SQL string concat, panic recovery |
 | `requirements.txt` + `flask` | Flask | Jinja2 `\| safe`, `SECRET_KEY`, CSRF (Flask-WTF), debug mode, `pickle.loads()` |
 
+## Guidelines Reference
+
+This file is read by `/security-audit` when installed globally at `~/.claude/security-audit-guidelines.md`. It defines conventions that the slash command follows when generating reports.
+
 ## Output Location
 
 Reports save to `./security-audit-report.md` in the project root. Add to `.gitignore` if reports should not be committed, or commit them as part of your security review workflow.

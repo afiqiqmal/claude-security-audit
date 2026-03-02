@@ -14,11 +14,11 @@ Based on `$ARGUMENTS`:
 - **full** (default if empty) - White-box + gray-box audit across all categories, hotspots and smells
 - **quick** - CRITICAL and HIGH severity issues only, skip hotspots, smells and gray-box
 - **gray** - Gray-box testing only (role-based access, API probing, credential boundaries)
-- **focus:auth** - Deep dive on authentication and authorization
-- **focus:api** - Deep dive on API security, input validation and rate limiting
+- **focus:auth** - Deep dive on authentication and authorization (includes hotspots for auth boundaries, skips gray-box and smells)
+- **focus:api** - Deep dive on API security, input validation and rate limiting (includes hotspots for input/output boundaries, skips gray-box and smells)
+- **focus:config** - Deep dive on configuration, supply chain and infrastructure (includes hotspots for config and third-party integrations, skips gray-box and smells)
 - **diff** - Scan only files changed since last commit (`git diff HEAD`), skip gray-box and smells
 - **diff:BRANCH** - Scan only files changed compared to a branch (e.g., `diff:main`), skip gray-box and smells
-- **focus:config** - Deep dive on configuration, supply chain and infrastructure
 
 ## Framework Mapping
 
@@ -41,7 +41,7 @@ Tag every finding with both:
 
 - **GV (Govern)** - GV.OC, GV.RM, GV.RR, GV.PO, GV.OV, GV.SC
 - **ID (Identify)** - ID.AM, ID.RA, ID.IM
-- **PR (Protect)** - PR.AA, PR.DS, PR.PS, PR.IR
+- **PR (Protect)** - PR.AA, PR.AT, PR.DS, PR.PS, PR.IR
 - **DE (Detect)** - DE.CM, DE.AE
 - **RS (Respond)** - RS.MA, RS.AN, RS.MI
 - **RC (Recover)** - RC.RP, RC.CO
@@ -81,16 +81,16 @@ Categories in priority order (aligned with OWASP Top 10:2025):
 2. **Security Misconfiguration** [A02:2025 | PR.PS] - Debug mode, default credentials, exposed admin panels, missing security headers, permissive CORS, directory listing, unnecessary features enabled, verbose error pages, exposed .git directory
 3. **Software Supply Chain Failures** [A03:2025 | GV.SC] - Known CVEs in dependencies, outdated packages, missing lock files, typosquatting, malicious packages, unverified build inputs, compromised CI/CD plugins, post-install script abuse, unmaintained transitive dependencies, unverified container base images
 4. **Cryptographic Failures** [A04:2025 | PR.DS] - Weak hashing, plaintext secrets, missing encryption at rest/transit, deprecated algorithms, hardcoded keys, exposed secrets in client bundles, weak TLS configuration
-5. **Injection** [A05:2025 | PR.DS] - SQL, NoSQL, command, LDAP, XPath, template (SSTI), header, expression language injection, stored/reflected/DOM XSS, CSRF
+5. **Injection** [A05:2025 | PR.DS, DE.CM] - SQL, NoSQL, command, LDAP, XPath, template (SSTI), header, expression language injection, HTTP request smuggling, stored/reflected/DOM XSS, CSRF
 6. **Insecure Design** [A06:2025 | GV.RM] - Missing threat modeling, insecure business flows, missing rate limits on high-value operations, no abuse case testing, trust boundary violations, no re-authentication for sensitive ops, race conditions by design
 7. **Identification and Authentication Failures** [A07:2025 | PR.AA] - Weak passwords, missing brute force protection, session fixation, insecure token generation, missing MFA, credential stuffing gaps, insecure password reset, OAuth state validation
-8. **Software and Data Integrity Failures** [A08:2025 | PR.DS] - Insecure deserialization, CI/CD pipeline injection, missing code signing, auto-update without verification, unsigned webhooks, untrusted data in build pipelines
-9. **Security Logging and Alerting Failures** [A09:2025 | DE.CM] - Missing audit logs for auth events, no log integrity protection, insufficient alerting on security events, sensitive data in logs, missing request tracing, no alerting on repeated auth failures, great logging but no alerting
+8. **Software and Data Integrity Failures** [A08:2025 | PR.DS, GV.SC] - Insecure deserialization, CI/CD pipeline injection, missing code signing, auto-update without verification, unsigned webhooks, untrusted data in build pipelines
+9. **Security Logging and Alerting Failures** [A09:2025 | DE.CM, DE.AE] - Missing audit logs for auth events, no log integrity protection, insufficient alerting on security events, sensitive data in logs, missing request tracing, no alerting on repeated auth failures, great logging but no alerting
 10. **Mishandling of Exceptional Conditions** [A10:2025 | DE.AE] - Fail-open logic (granting access on error), error messages leaking secrets or stack traces, NULL dereference crashes, unhandled resource exhaustion, missing timeout handling, inconsistent error responses, silent failures masking security events, failing to detect or respond to abnormal conditions
 11. **File Upload & Storage** [A01:2025, A06:2025 | PR.DS] - Unrestricted types, path traversal, executable uploads, public buckets
 12. **API Security** [A01:2025, A05:2025, A06:2025 | PR.AA] - Rate limiting, validation, error verbosity, broken object-level auth, excessive data exposure
-13. **Business Logic Flaws** [A06:2025 | PR.DS] - Race conditions, price manipulation, workflow bypass, integer overflow
-14. **Infrastructure & DevOps** [A02:2025, A03:2025, A08:2025 | PR.PS] - Dockerfile security, exposed ports, secrets in git, CI/CD injection, overly permissive IAM
+13. **Business Logic Flaws** [A06:2025 | PR.DS, DE.AE] - Race conditions, price manipulation, workflow bypass, integer overflow
+14. **Infrastructure & DevOps** [A02:2025, A03:2025, A08:2025 | PR.PS, GV.SC] - Dockerfile security, exposed ports, secrets in git, CI/CD injection, overly permissive IAM
 15. **AI/LLM Security** [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA] - Prompt injection (direct and indirect), PII sent to external AI APIs, AI output rendered without sanitization (XSS via LLM), tool/function calling without permission checks, RAG data poisoning, missing cost/abuse monitoring, API key leakage for AI services, fail-open when AI service is down
 16. **WebSocket Security** [A01:2025, A05:2025, A07:2025 | PR.AA, PR.DS] - Handshake auth, per-message authorization, cross-site WebSocket hijacking, broadcast isolation, message validation, connection exhaustion, backpressure
 17. **gRPC Security** [A01:2025, A05:2025, A02:2025 | PR.AA, PR.DS] - mTLS enforcement, per-RPC auth, metadata injection, message size limits, reflection disabled, streaming rate limits
@@ -232,12 +232,12 @@ Save the report to `./security-audit-report.md` in the project root.
 
 | Function | Categories | Findings | Status |
 |----------|-----------|----------|--------|
-| GV (Govern) | GV.RM, GV.SC | X | [needs attention / acceptable] |
-| ID (Identify) | ID.AM, ID.RA | X | [needs attention / acceptable] |
-| PR (Protect) | PR.AA, PR.DS, PR.PS | X | [needs attention / acceptable] |
+| GV (Govern) | GV.OC, GV.RM, GV.RR, GV.PO, GV.OV, GV.SC | X | [needs attention / acceptable] |
+| ID (Identify) | ID.AM, ID.RA, ID.IM | X | [needs attention / acceptable] |
+| PR (Protect) | PR.AA, PR.AT, PR.DS, PR.PS, PR.IR | X | [needs attention / acceptable] |
 | DE (Detect) | DE.CM, DE.AE | X | [needs attention / acceptable] |
-| RS (Respond) | RS.MA | X | [needs attention / acceptable] |
-| RC (Recover) | RC.RP | X | [needs attention / acceptable] |
+| RS (Respond) | RS.MA, RS.AN, RS.MI | X | [needs attention / acceptable] |
+| RC (Recover) | RC.RP, RC.CO | X | [needs attention / acceptable] |
 
 ## Critical & High Findings
 
