@@ -1,6 +1,6 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*)
-description: Run a comprehensive white-box and gray-box security audit on the current project with OWASP Top 10:2025 and NIST CSF 2.0 mapping, security hotspots and code smells. Shows findings by default. Append --fix to include remediation code blocks.
+description: Run a comprehensive white-box and gray-box security audit with OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping. Shows findings by default. Append --fix to include remediation code blocks.
 argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config] [--fix]"
 ---
 
@@ -28,7 +28,7 @@ Examples: `/security-audit --fix`, `/security-audit quick --fix`, `/security-aud
 
 ## Framework Mapping
 
-Tag every finding with both:
+Tag every finding with all applicable frameworks:
 
 ### OWASP Top 10:2025
 
@@ -52,7 +52,23 @@ Tag every finding with both:
 - **RS (Respond)** - RS.MA, RS.AN, RS.MI
 - **RC (Recover)** - RC.RP, RC.CO
 
-Read `~/.claude/security-audit-references/nist-csf-mapping.md` for the full mapping table if available.
+### CWE (Common Weakness Enumeration)
+
+Tag each finding with the most specific CWE ID (e.g., CWE-89 for SQL injection, CWE-79 for XSS). Use the compliance mapping reference for the full list.
+
+### Additional Compliance Frameworks
+
+When relevant, also tag findings with:
+- **SANS/CWE Top 25** - Note if the finding matches a Top 25 entry (e.g., "SANS Top 25 #3")
+- **OWASP ASVS 4.0** - Reference the ASVS chapter and requirement (e.g., "ASVS V5.3.4")
+- **PCI DSS 4.0** - Reference the requirement (e.g., "PCI DSS 6.2.4") - especially for apps handling payment data
+- **MITRE ATT&CK** - Reference the technique ID (e.g., "T1190") - shows how attackers exploit the finding
+- **SOC 2** - Reference the Trust Service Criteria (e.g., "CC6.1") - for SaaS compliance
+- **ISO 27001:2022** - Reference the Annex A control (e.g., "A.8.28") - for ISO-certified organizations
+
+Read `~/.claude/security-audit-references/nist-csf-mapping.md` for the full NIST mapping table if available.
+
+Read `~/.claude/security-audit-references/compliance-mapping.md` for the full cross-framework mapping (CWE, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2, ISO 27001) if available.
 
 For framework-specific checks, read the matching file from `~/.claude/security-audit-references/frameworks/` based on the detected framework (e.g., `frameworks/laravel.md`, `frameworks/nextjs.md`).
 
@@ -197,8 +213,10 @@ Flag sensitive code areas that are not vulnerable today but would break if modif
 3. **Assess impact** - What data is at risk? Can the attacker escalate?
 4. **Rate severity** - CRITICAL / HIGH / MEDIUM / LOW / INFO
 5. **Map to OWASP** - A01:2025 through A10:2025
-6. **Map to NIST CSF 2.0** - Function and category
-7. **Write the fix** - Real, copy-paste-ready code patches
+6. **Map to CWE** - Most specific CWE ID (e.g., CWE-89, not CWE-74)
+7. **Map to NIST CSF 2.0** - Function and category
+8. **Map to compliance** - SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 (where applicable)
+9. **Write the fix** - Real, copy-paste-ready code patches
 
 ### Phase 7: Generate Report
 
@@ -250,12 +268,26 @@ Save the report to `./security-audit-report.md` in the project root.
 | RS (Respond) | RS.MA, RS.AN, RS.MI | X | [needs attention / acceptable] |
 | RC (Recover) | RC.RP, RC.CO | X | [needs attention / acceptable] |
 
+## Compliance Coverage
+
+| Framework | Coverage | Details |
+|-----------|----------|---------|
+| CWE | X unique CWEs identified | [list top CWE IDs found] |
+| SANS/CWE Top 25 | X/25 entries found | [list matching entries] |
+| OWASP ASVS 4.0 | X/14 chapters with findings | [list chapters] |
+| PCI DSS 4.0 | X requirements relevant | [list relevant requirements] |
+| MITRE ATT&CK | X techniques mapped | [list technique IDs] |
+| SOC 2 | X criteria with findings | [list criteria] |
+| ISO 27001:2022 | X controls with findings | [list controls] |
+
 ## Critical & High Findings
 
 ### [CRITICAL-001] Title
 - **Severity**: CRITICAL
 - **OWASP**: A05:2025 (Injection)
+- **CWE**: CWE-89 (SQL Injection)
 - **NIST CSF**: PR.DS (Data Security)
+- **Compliance**: SANS Top 25 #3 | ASVS V5.3.4 | PCI DSS 6.2.4 | T1190 | CC6.6 | A.8.28
 - **Location**: `path/to/file:123`
 - **Attack Vector**: [step-by-step]
 - **Impact**: [consequences]
@@ -275,7 +307,9 @@ Save the report to `./security-audit-report.md` in the project root.
 ### [GRAY-001] Title
 - **Severity**: [rating]
 - **OWASP**: [A01:2025/A06:2025/A07:2025]
+- **CWE**: [CWE-ID]
 - **NIST CSF**: [category]
+- **Compliance**: [applicable framework references]
 - **Tested As**: [role/context]
 - **Endpoint**: `[METHOD] /path`
 - **Expected**: [what should happen]
@@ -311,6 +345,10 @@ Save the report to `./security-audit-report.md` in the project root.
 - Gray-box: [roles tested, endpoints probed]
 - OWASP Top 10:2025 coverage: [X/10 categories]
 - NIST CSF 2.0 coverage: [functions covered]
+- CWE coverage: [unique CWE IDs identified]
+- SANS/CWE Top 25 coverage: [X/25 matched]
+- ASVS 4.0 chapters covered: [chapters checked]
+- Additional frameworks: PCI DSS 4.0, MITRE ATT&CK, SOC 2, ISO 27001:2022
 ```
 
 ## Execution Rules
@@ -318,7 +356,7 @@ Save the report to `./security-audit-report.md` in the project root.
 1. Read every route, controller, model, middleware, config, migration and seeder
 2. Every finding must reference actual code with file path and line number
 3. Every finding must show the vulnerable code snippet
-4. Every finding must have both OWASP Top 10:2025 and NIST CSF mapping
+4. Every finding must have OWASP Top 10:2025, CWE ID and NIST CSF mapping. Include other compliance references (SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001) where applicable
 5. Gray-box findings must include the role tested, endpoint, expected vs actual behavior
 6. If an area is clean, say so explicitly
 7. Don't fabricate findings - false positives waste time

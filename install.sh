@@ -125,6 +125,14 @@ else
     FAILED=$((FAILED + 1))
 fi
 
+if install_file "references/compliance-mapping.md" "$REFERENCES_DIR/compliance-mapping.md"; then
+    echo -e "  ${GREEN}✓${NC} compliance-mapping.md reference"
+    INSTALLED=$((INSTALLED + 1))
+else
+    echo -e "  ${RED}✗${NC} compliance-mapping.md reference"
+    FAILED=$((FAILED + 1))
+fi
+
 # Install framework reference files
 FRAMEWORKS="laravel nextjs fastapi express django rails spring-boot aspnet-core go flask"
 FRAMEWORK_FAILED=0

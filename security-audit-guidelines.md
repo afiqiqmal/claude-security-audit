@@ -1,6 +1,6 @@
 # Security Audit Guidelines
 
-Global security audit standards for Claude Code projects. Defines the methodology, severity ratings, OWASP/NIST mapping conventions and report format used by `/security-audit`.
+Global security audit standards for Claude Code projects. Defines the methodology, severity ratings, compliance mapping conventions and report format used by `/security-audit`.
 
 ## Severity Ratings
 
@@ -55,9 +55,25 @@ Global security audit standards for Claude Code projects. Defines the methodolog
 | RS | Respond | Incident management, analysis, mitigation |
 | RC | Recover | Recovery planning, coordination |
 
+## Compliance Frameworks Quick Reference
+
+| Framework | Version | Tag Format | Example |
+|-----------|---------|-----------|---------|
+| OWASP Top 10 | 2025 | A01:2025 - A10:2025 | A05:2025 |
+| CWE | 4.x | CWE-{ID} | CWE-89 |
+| NIST CSF | 2.0 | {Function}.{Category} | PR.DS |
+| SANS/CWE Top 25 | 2024 | SANS Top 25 #{rank} | SANS Top 25 #3 |
+| OWASP ASVS | 4.0 | ASVS V{chapter}.{section}.{req} | ASVS V5.3.4 |
+| PCI DSS | 4.0 | PCI DSS {req} | PCI DSS 6.2.4 |
+| MITRE ATT&CK | v15 | T{ID} | T1190 |
+| SOC 2 | 2017 | CC{X}.{Y} | CC6.1 |
+| ISO 27001 | 2022 | A.{X}.{Y} | A.8.28 |
+
+See `~/.claude/security-audit-references/compliance-mapping.md` for the full cross-reference tables.
+
 ## Report Conventions
 
-- Every finding must have both OWASP Top 10:2025 and NIST mapping
+- Every finding must have OWASP Top 10:2025, CWE ID and NIST CSF mapping (other frameworks where applicable)
 - One finding per issue (don't bundle multiple vulnerabilities)
 - Show exact file path and line number
 - Include both vulnerable code and fixed code

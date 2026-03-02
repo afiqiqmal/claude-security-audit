@@ -1,6 +1,6 @@
 # Attack Vectors Reference
 
-Detailed checklists for each attack category. Use these as a systematic guide when auditing each area. Every section is tagged with OWASP Top 10:2025 and NIST CSF 2.0.
+Detailed checklists for each attack category. Use these as a systematic guide when auditing each area. Every section is tagged with OWASP Top 10:2025, NIST CSF 2.0 and top CWE IDs. See `compliance-mapping.md` for full cross-references to SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
 
 ## OWASP Top 10:2025 Changes from 2021
 
@@ -18,26 +18,26 @@ Detailed checklists for each attack category. Use these as a systematic guide wh
 | A10:2025 | Mishandling of Exceptional Conditions | NEW |
 
 ## Table of Contents
-1. [Broken Access Control (A01:2025)](#1-broken-access-control-a012025--praa)
-2. [Security Misconfiguration (A02:2025)](#2-security-misconfiguration-a022025--prps)
-3. [Software Supply Chain Failures (A03:2025)](#3-software-supply-chain-failures-a032025--gvsc)
-4. [Cryptographic Failures (A04:2025)](#4-cryptographic-failures-a042025--prds)
-5. [Injection (A05:2025)](#5-injection-a052025--prds-decm)
-6. [Insecure Design (A06:2025)](#6-insecure-design-a062025--gvrm)
-7. [Identification and Authentication Failures (A07:2025)](#7-identification-and-authentication-failures-a072025--praa)
-8. [Software and Data Integrity Failures (A08:2025)](#8-software-and-data-integrity-failures-a082025--prds-gvsc)
-9. [Security Logging and Alerting Failures (A09:2025)](#9-security-logging-and-alerting-failures-a092025--decm-deae)
-10. [Mishandling of Exceptional Conditions (A10:2025)](#10-mishandling-of-exceptional-conditions-a102025--deae)
-11. [XSS](#11-xss-a052025--prds)
-12. [CSRF](#12-csrf-a012025--prds)
-13. [File Upload & Storage](#13-file-upload--storage-a012025-a062025--prds)
-14. [API Security](#14-api-security-a012025-a052025-a062025--praa)
-15. [Business Logic Flaws](#15-business-logic-flaws-a062025--prds-deae)
-16. [Infrastructure & DevOps](#16-infrastructure--devops-a022025-a032025-a082025--prps-gvsc)
-17. [AI/LLM Security](#17-aillm-security-a052025-a012025-a042025--prds-praa)
-18. [WebSocket Security](#18-websocket-security-a012025-a052025-a072025--praa-prds)
-19. [gRPC Security](#19-grpc-security-a012025-a052025-a022025--praa-prds)
-20. [Serverless and Cloud-Native](#20-serverless-and-cloud-native-a012025-a022025-a032025--prps-praa)
+1. [Broken Access Control (A01:2025)](#1-broken-access-control-a012025--praa--cwe-284-cwe-862-cwe-863-cwe-639-cwe-918)
+2. [Security Misconfiguration (A02:2025)](#2-security-misconfiguration-a022025--prps--cwe-16-cwe-611-cwe-942-cwe-756)
+3. [Software Supply Chain Failures (A03:2025)](#3-software-supply-chain-failures-a032025--gvsc--cwe-829-cwe-494-cwe-1104)
+4. [Cryptographic Failures (A04:2025)](#4-cryptographic-failures-a042025--prds--cwe-327-cwe-328-cwe-330-cwe-321)
+5. [Injection (A05:2025)](#5-injection-a052025--prds-decm--cwe-79-cwe-89-cwe-78-cwe-94-cwe-917)
+6. [Insecure Design (A06:2025)](#6-insecure-design-a062025--gvrm--cwe-209-cwe-434-cwe-799-cwe-841)
+7. [Identification and Authentication Failures (A07:2025)](#7-identification-and-authentication-failures-a072025--praa--cwe-287-cwe-307-cwe-384-cwe-798)
+8. [Software and Data Integrity Failures (A08:2025)](#8-software-and-data-integrity-failures-a082025--prds-gvsc--cwe-502-cwe-345-cwe-494-cwe-915)
+9. [Security Logging and Alerting Failures (A09:2025)](#9-security-logging-and-alerting-failures-a092025--decm-deae--cwe-778-cwe-532-cwe-117)
+10. [Mishandling of Exceptional Conditions (A10:2025)](#10-mishandling-of-exceptional-conditions-a102025--deae--cwe-754-cwe-755-cwe-248-cwe-390)
+11. [XSS](#11-xss-a052025--prds--cwe-79-cwe-80-cwe-83)
+12. [CSRF](#12-csrf-a012025--prds--cwe-352)
+13. [File Upload & Storage](#13-file-upload--storage-a012025-a062025--prds--cwe-434-cwe-22)
+14. [API Security](#14-api-security-a012025-a052025-a062025--praa--cwe-862-cwe-20-cwe-200)
+15. [Business Logic Flaws](#15-business-logic-flaws-a062025--prds-deae--cwe-841-cwe-799-cwe-362)
+16. [Infrastructure & DevOps](#16-infrastructure--devops-a022025-a032025-a082025--prps-gvsc--cwe-16-cwe-260-cwe-829)
+17. [AI/LLM Security](#17-aillm-security-a052025-a012025-a042025--prds-praa--cwe-74-cwe-20-cwe-200)
+18. [WebSocket Security](#18-websocket-security-a012025-a052025-a072025--praa-prds--cwe-287-cwe-20-cwe-400)
+19. [gRPC Security](#19-grpc-security-a012025-a052025-a022025--praa-prds--cwe-287-cwe-20-cwe-400)
+20. [Serverless and Cloud-Native](#20-serverless-and-cloud-native-a012025-a022025-a032025--prps-praa--cwe-269-cwe-16-cwe-284)
 21. [Gray-Box Testing](#21-gray-box-testing-a012025-a062025-a072025)
 22. [Security Hotspots](#22-security-hotspots-a062025--id-gv)
 23. [Code Smells](#23-code-smells-a062025--gv-pr)
@@ -45,7 +45,7 @@ Detailed checklists for each attack category. Use these as a systematic guide wh
 
 ---
 
-## 1. Broken Access Control [A01:2025 | PR.AA]
+## 1. Broken Access Control [A01:2025 | PR.AA | CWE-284, CWE-862, CWE-863, CWE-639, CWE-918]
 
 Now includes SSRF (previously A10:2021), reflecting that SSRF is fundamentally about improper access control.
 
@@ -92,7 +92,7 @@ Now includes SSRF (previously A10:2021), reflecting that SSRF is fundamentally a
 
 ---
 
-## 2. Security Misconfiguration [A02:2025 | PR.PS]
+## 2. Security Misconfiguration [A02:2025 | PR.PS | CWE-16, CWE-611, CWE-942, CWE-756]
 
 Moved up from #5 in 2021 to #2 in 2025. Now affects 3% of tested applications.
 
@@ -113,7 +113,7 @@ Moved up from #5 in 2021 to #2 in 2025. Now affects 3% of tested applications.
 
 ---
 
-## 3. Software Supply Chain Failures [A03:2025 | GV.SC]
+## 3. Software Supply Chain Failures [A03:2025 | GV.SC | CWE-829, CWE-494, CWE-1104]
 
 NEW in 2025. Expands the old "Vulnerable and Outdated Components" (A06:2021) to cover the entire software supply chain. Has the highest average exploit and impact scores from CVEs.
 
@@ -158,7 +158,7 @@ NEW in 2025. Expands the old "Vulnerable and Outdated Components" (A06:2021) to 
 
 ---
 
-## 4. Cryptographic Failures [A04:2025 | PR.DS]
+## 4. Cryptographic Failures [A04:2025 | PR.DS | CWE-327, CWE-328, CWE-330, CWE-321]
 
 ### Passwords
 - [ ] Are passwords hashed with bcrypt/argon2 (not MD5/SHA1/SHA256)?
@@ -187,7 +187,7 @@ NEW in 2025. Expands the old "Vulnerable and Outdated Components" (A06:2021) to 
 
 ---
 
-## 5. Injection [A05:2025 | PR.DS, DE.CM]
+## 5. Injection [A05:2025 | PR.DS, DE.CM | CWE-79, CWE-89, CWE-78, CWE-94, CWE-917]
 
 ### SQL Injection
 - [ ] Are all database queries parameterized?
@@ -229,7 +229,7 @@ NEW in 2025. Expands the old "Vulnerable and Outdated Components" (A06:2021) to 
 
 ---
 
-## 6. Insecure Design [A06:2025 | GV.RM]
+## 6. Insecure Design [A06:2025 | GV.RM | CWE-209, CWE-434, CWE-799, CWE-841]
 
 Covers fundamental design flaws, not implementation bugs.
 
@@ -259,7 +259,7 @@ Covers fundamental design flaws, not implementation bugs.
 
 ---
 
-## 7. Identification and Authentication Failures [A07:2025 | PR.AA]
+## 7. Identification and Authentication Failures [A07:2025 | PR.AA | CWE-287, CWE-307, CWE-384, CWE-798]
 
 ### Sessions
 - [ ] Are session IDs generated with a CSPRNG?
@@ -307,7 +307,7 @@ Covers fundamental design flaws, not implementation bugs.
 
 ---
 
-## 8. Software and Data Integrity Failures [A08:2025 | PR.DS, GV.SC]
+## 8. Software and Data Integrity Failures [A08:2025 | PR.DS, GV.SC | CWE-502, CWE-345, CWE-494, CWE-915]
 
 ### Software Integrity
 - [ ] Are CI/CD pipelines protected from unauthorized modification?
@@ -329,7 +329,7 @@ Covers fundamental design flaws, not implementation bugs.
 
 ---
 
-## 9. Security Logging and Alerting Failures [A09:2025 | DE.CM, DE.AE]
+## 9. Security Logging and Alerting Failures [A09:2025 | DE.CM, DE.AE | CWE-778, CWE-532, CWE-117]
 
 Renamed from "Security Logging and Monitoring Failures" to emphasize that logging without alerting is insufficient.
 
@@ -362,7 +362,7 @@ Renamed from "Security Logging and Monitoring Failures" to emphasize that loggin
 
 ---
 
-## 10. Mishandling of Exceptional Conditions [A10:2025 | DE.AE]
+## 10. Mishandling of Exceptional Conditions [A10:2025 | DE.AE | CWE-754, CWE-755, CWE-248, CWE-390]
 
 NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors, failing open and other scenarios when systems encounter abnormal conditions. 50% of OWASP survey respondents ranked this their #1 emerging concern.
 
@@ -412,7 +412,7 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 11. XSS [A05:2025 | PR.DS]
+## 11. XSS [A05:2025 | PR.DS | CWE-79, CWE-80, CWE-83]
 
 ### Stored XSS
 - [ ] Is user-generated content (comments, profiles, messages) escaped on output?
@@ -437,7 +437,7 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 12. CSRF [A01:2025 | PR.DS]
+## 12. CSRF [A01:2025 | PR.DS | CWE-352]
 
 - [ ] Are CSRF tokens included in all state-changing forms?
 - [ ] Are CSRF tokens validated server-side?
@@ -448,7 +448,7 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 13. File Upload & Storage [A01:2025, A06:2025 | PR.DS]
+## 13. File Upload & Storage [A01:2025, A06:2025 | PR.DS | CWE-434, CWE-22]
 
 - [ ] Are file types validated server-side (not just by extension)?
 - [ ] Are uploaded files scanned for executable content?
@@ -461,7 +461,7 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 14. API Security [A01:2025, A05:2025, A06:2025 | PR.AA]
+## 14. API Security [A01:2025, A05:2025, A06:2025 | PR.AA | CWE-862, CWE-20, CWE-200]
 
 ### REST API
 - [ ] Is input validation applied to all API parameters?
@@ -486,7 +486,7 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 15. Business Logic Flaws [A06:2025 | PR.DS, DE.AE]
+## 15. Business Logic Flaws [A06:2025 | PR.DS, DE.AE | CWE-841, CWE-799, CWE-362]
 
 - [ ] Race conditions: can concurrent requests exploit timing (double-spend)?
 - [ ] Price/quantity manipulation: can negative values bypass rules?
@@ -497,7 +497,7 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 16. Infrastructure & DevOps [A02:2025, A03:2025, A08:2025 | PR.PS, GV.SC]
+## 16. Infrastructure & DevOps [A02:2025, A03:2025, A08:2025 | PR.PS, GV.SC | CWE-16, CWE-260, CWE-829]
 
 ### Docker
 - [ ] Is the container running as non-root?
@@ -518,7 +518,7 @@ NEW in 2025. Covers 24 CWEs focusing on improper error handling, logical errors,
 
 ---
 
-## 17. AI/LLM Security [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA]
+## 17. AI/LLM Security [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA | CWE-74, CWE-20, CWE-200]
 
 Covers applications that integrate AI/LLM services (OpenAI, Anthropic, Google AI, Cohere, local models via Ollama/vLLM). Aligned with OWASP Top 10 for LLM Applications 2025.
 
@@ -585,7 +585,7 @@ Covers applications that integrate AI/LLM services (OpenAI, Anthropic, Google AI
 
 ---
 
-## 18. WebSocket Security [A01:2025, A05:2025, A07:2025 | PR.AA, PR.DS]
+## 18. WebSocket Security [A01:2025, A05:2025, A07:2025 | PR.AA, PR.DS | CWE-287, CWE-20, CWE-400]
 
 Covers WebSocket (ws/wss) and Server-Sent Events (SSE) implementations.
 
@@ -619,7 +619,7 @@ Covers WebSocket (ws/wss) and Server-Sent Events (SSE) implementations.
 
 ---
 
-## 19. gRPC Security [A01:2025, A05:2025, A02:2025 | PR.AA, PR.DS]
+## 19. gRPC Security [A01:2025, A05:2025, A02:2025 | PR.AA, PR.DS | CWE-287, CWE-20, CWE-400]
 
 ### Transport Security
 - [ ] Is TLS/mTLS enforced for all gRPC connections (not plaintext)?
@@ -654,7 +654,7 @@ Covers WebSocket (ws/wss) and Server-Sent Events (SSE) implementations.
 
 ---
 
-## 20. Serverless and Cloud-Native [A01:2025, A02:2025, A03:2025 | PR.PS, PR.AA]
+## 20. Serverless and Cloud-Native [A01:2025, A02:2025, A03:2025 | PR.PS, PR.AA | CWE-269, CWE-16, CWE-284]
 
 ### Serverless / FaaS (Lambda, Cloud Functions, Azure Functions)
 - [ ] Are execution roles following least privilege (not `*` on all resources)?

@@ -1,13 +1,15 @@
 # Claude Security Audit
 
-A Claude Code slash command for running comprehensive white-box and gray-box security audits on your projects, with findings mapped to OWASP Top 10:2025 and NIST CSF 2.0.
+A Claude Code slash command for running comprehensive white-box and gray-box security audits on your projects, with findings mapped to OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS/CWE Top 25, OWASP ASVS, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
 
 ## Features
 
 - **Slash Command** - Run `/security-audit` in any project from Claude Code
 - **Local Output** - Report saves to `./security-audit-report.md` in your project root
 - **OWASP Top 10:2025 Coverage** - All 10 categories explicitly tested (A01-A10:2025)
+- **CWE Mapping** - Every finding tagged with specific CWE IDs
 - **NIST CSF 2.0 Mapping** - Every finding maps to Govern, Identify, Protect, Detect, Respond or Recover
+- **Multi-Framework Compliance** - SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022
 - **White-Box Testing** - 18 attack categories with 850+ individual checks
 - **AI/LLM Security** - Prompt injection, output sanitization, RAG poisoning, cost monitoring, tool calling permissions
 - **Diff Mode** - Scan only git-changed files for fast PR-level reviews
@@ -27,8 +29,9 @@ claude-security-audit/
 │   └── commands/
 │       └── security-audit.md       # /security-audit slash command
 ├── references/
-│   ├── attack-vectors.md           # 850+ security checks (OWASP 2025 + NIST tagged)
+│   ├── attack-vectors.md           # 850+ security checks (OWASP 2025 + NIST + CWE tagged)
 │   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
+│   ├── compliance-mapping.md       # CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001
 │   ├── custom-template.md          # Template for custom checks
 │   └── frameworks/                 # Framework-specific checklists
 │       ├── laravel.md
@@ -76,8 +79,9 @@ When installed per-project, use `/project:security-audit`.
 | File | Location | Purpose |
 |------|----------|---------|
 | `security-audit.md` | `~/.claude/commands/` | `/security-audit` slash command |
-| `attack-vectors.md` | `~/.claude/security-audit-references/` | 850+ OWASP 2025/NIST-tagged security checks |
+| `attack-vectors.md` | `~/.claude/security-audit-references/` | 850+ OWASP 2025/NIST/CWE-tagged security checks |
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
+| `compliance-mapping.md` | `~/.claude/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
 | `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 10 framework-specific checklists |
 | `custom-template.md` | `~/.claude/security-audit-custom/` | Template for writing custom checks |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
@@ -155,6 +159,21 @@ Custom checks are loaded during Phase 1 (reconnaissance) and run as additional c
 | 8 | Software and Data Integrity Failures | A08:2025 | Unchanged |
 | 9 | Security Logging and Alerting Failures | A09:2025 | Renamed - emphasis on alerting |
 | 10 | Mishandling of Exceptional Conditions | A10:2025 | NEW - fail-open logic, crashes, silent failures |
+
+## Compliance Frameworks
+
+Every finding is tagged with the applicable compliance references:
+
+| Framework | Version | What It Provides |
+|-----------|---------|-----------------|
+| CWE | 4.x | Specific weakness IDs per finding (e.g., CWE-89 for SQL injection) |
+| SANS/CWE Top 25 | 2024 | Flags findings matching the 25 most dangerous software weaknesses |
+| OWASP ASVS | 4.0 | Maps findings to 286 verification requirements across 14 chapters (L1/L2/L3) |
+| PCI DSS | 4.0 | Maps findings to payment card industry requirements (Req 2-12) |
+| MITRE ATT&CK | v15 | Maps findings to attacker techniques (Initial Access through Impact) |
+| SOC 2 | 2017 | Maps findings to Trust Service Criteria (CC6, CC7, CC8) |
+| ISO 27001 | 2022 | Maps findings to Annex A controls (A.5-A.8) |
+| NIST CSF | 2.0 | Maps findings to Govern, Identify, Protect, Detect, Respond, Recover |
 
 ## Additional Attack Categories
 
