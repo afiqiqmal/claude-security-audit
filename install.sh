@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Claude Security Audit Installer
-# Usage (remote): curl -fsSL https://raw.githubusercontent.com/afiqiqmal/claude-security-audit/main/install.sh | bash
-# Usage (local):  bash install.sh
+# Usage (remote):    curl -fsSL https://raw.githubusercontent.com/afiqiqmal/claude-security-audit/main/install.sh | bash
+# Usage (local):     bash install.sh
+# Usage (uninstall): bash install.sh --uninstall
 
 set -e
 
@@ -169,6 +170,7 @@ if [ ! -f "$CUSTOM_DIR/custom-template.md" ]; then
     fi
 else
     echo -e "  ${GREEN}✓${NC} custom checks folder (already exists)"
+    INSTALLED=$((INSTALLED + 1))
 fi
 
 # Install guidelines

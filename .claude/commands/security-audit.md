@@ -20,7 +20,7 @@ Based on `$ARGUMENTS`:
 - **diff** - Scan only files changed since last commit (`git diff HEAD`), skip gray-box and smells (Phases 0, 1, 2, 4)
 - **diff:BRANCH** - Scan only files changed compared to a branch (e.g., `diff:main`), skip gray-box and smells (Phases 0, 1, 2, 4)
 - **phase:1** - Reconnaissance only - map project structure, tech stack, entry points, data flow and custom checks
-- **phase:2** - White-box analysis only - run all 18 attack categories against the full codebase
+- **phase:2** - White-box analysis only - run all 20 attack categories against the full codebase
 - **phase:3** - Gray-box testing only - role-based access, API probing, credential boundaries, rate limits, error differentials
 - **phase:4** - Security hotspots only - flag sensitive code areas that need careful review
 - **phase:5** - Code smells only - structural, data handling, error handling, dependency and design patterns
@@ -126,8 +126,8 @@ If `$ARGUMENTS` starts with `diff`:
 For `full`, `diff` and `phase:2` modes: read `~/.claude/security-audit-references/attack-vectors.md` for the detailed checklist.
 For `focus` modes: read only the relevant sections of `attack-vectors.md`:
 - `focus:auth` - sections 1 (Broken Access Control) and 7 (Identification and Authentication Failures)
-- `focus:api` - sections 1 (Broken Access Control), 5 (Injection) and 12 (API Security)
-- `focus:config` - sections 2 (Security Misconfiguration), 3 (Software Supply Chain Failures) and 8 (Software and Data Integrity Failures)
+- `focus:api` - sections 1 (Broken Access Control), 5 (Injection), 6 (Insecure Design) and 14 (API Security)
+- `focus:config` - sections 2 (Security Misconfiguration), 3 (Software Supply Chain Failures), 8 (Software and Data Integrity Failures) and 16 (Infrastructure & DevOps)
 
 For `quick` mode: use the inline category summaries below (do NOT read attack-vectors.md).
 
@@ -137,20 +137,22 @@ Categories in priority order (aligned with OWASP Top 10:2025):
 2. **Security Misconfiguration** [A02:2025 | PR.PS] - Debug mode, default credentials, exposed admin panels, missing security headers, permissive CORS, directory listing, unnecessary features enabled, verbose error pages, exposed .git directory
 3. **Software Supply Chain Failures** [A03:2025 | GV.SC] - Known CVEs in dependencies, outdated packages, missing lock files, typosquatting, malicious packages, unverified build inputs, compromised CI/CD plugins, post-install script abuse, unmaintained transitive dependencies, unverified container base images
 4. **Cryptographic Failures** [A04:2025 | PR.DS] - Weak hashing, plaintext secrets, missing encryption at rest/transit, deprecated algorithms, hardcoded keys, exposed secrets in client bundles, weak TLS configuration
-5. **Injection** [A05:2025 | PR.DS, DE.CM] - SQL, NoSQL, command, LDAP, XPath, template (SSTI), header, expression language injection, HTTP request smuggling, stored/reflected/DOM XSS, CSRF
+5. **Injection** [A05:2025 | PR.DS, DE.CM] - SQL, NoSQL, command, LDAP, XPath, template (SSTI), header, expression language injection, HTTP request smuggling
 6. **Insecure Design** [A06:2025 | GV.RM] - Missing threat modeling, insecure business flows, missing rate limits on high-value operations, no abuse case testing, trust boundary violations, no re-authentication for sensitive ops, race conditions by design
 7. **Identification and Authentication Failures** [A07:2025 | PR.AA] - Weak passwords, missing brute force protection, session fixation, insecure token generation, missing MFA, credential stuffing gaps, insecure password reset, OAuth state validation
 8. **Software and Data Integrity Failures** [A08:2025 | PR.DS, GV.SC] - Insecure deserialization, CI/CD pipeline injection, missing code signing, auto-update without verification, unsigned webhooks, untrusted data in build pipelines
 9. **Security Logging and Alerting Failures** [A09:2025 | DE.CM, DE.AE] - Missing audit logs for auth events, no log integrity protection, insufficient alerting on security events, sensitive data in logs, missing request tracing, no alerting on repeated auth failures, great logging but no alerting
 10. **Mishandling of Exceptional Conditions** [A10:2025 | DE.AE] - Fail-open logic (granting access on error), error messages leaking secrets or stack traces, NULL dereference crashes, unhandled resource exhaustion, missing timeout handling, inconsistent error responses, silent failures masking security events, failing to detect or respond to abnormal conditions
-11. **File Upload & Storage** [A01:2025, A06:2025 | PR.DS] - Unrestricted types, path traversal, executable uploads, public buckets
-12. **API Security** [A01:2025, A05:2025, A06:2025 | PR.AA] - Rate limiting, validation, error verbosity, broken object-level auth, excessive data exposure
-13. **Business Logic Flaws** [A06:2025 | PR.DS, DE.AE] - Race conditions, price manipulation, workflow bypass, integer overflow
-14. **Infrastructure & DevOps** [A02:2025, A03:2025, A08:2025 | PR.PS, GV.SC] - Dockerfile security, exposed ports, secrets in git, CI/CD injection, overly permissive IAM
-15. **AI/LLM Security** [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA] - Prompt injection (direct and indirect), PII sent to external AI APIs, AI output rendered without sanitization (XSS via LLM), tool/function calling without permission checks, RAG data poisoning, missing cost/abuse monitoring, API key leakage for AI services, fail-open when AI service is down
-16. **WebSocket Security** [A01:2025, A05:2025, A07:2025 | PR.AA, PR.DS] - Handshake auth, per-message authorization, cross-site WebSocket hijacking, broadcast isolation, message validation, connection exhaustion, backpressure
-17. **gRPC Security** [A01:2025, A05:2025, A02:2025 | PR.AA, PR.DS] - mTLS enforcement, per-RPC auth, metadata injection, message size limits, reflection disabled, streaming rate limits
-18. **Serverless and Cloud-Native** [A01:2025, A02:2025, A03:2025 | PR.PS, PR.AA] - Lambda/Functions execution role privilege, K8s RBAC and pod security, NetworkPolicies, IaC state security, admission controllers
+11. **XSS** [A05:2025 | PR.DS] - Stored, reflected and DOM-based XSS, attribute injection, JavaScript URI schemes
+12. **CSRF** [A01:2025 | PR.DS] - Missing anti-CSRF tokens, SameSite cookie gaps, cross-origin state changes
+13. **File Upload & Storage** [A01:2025, A06:2025 | PR.DS] - Unrestricted types, path traversal, executable uploads, public buckets
+14. **API Security** [A01:2025, A05:2025, A06:2025 | PR.AA] - Rate limiting, validation, error verbosity, broken object-level auth, excessive data exposure
+15. **Business Logic Flaws** [A06:2025 | PR.DS, DE.AE] - Race conditions, price manipulation, workflow bypass, integer overflow
+16. **Infrastructure & DevOps** [A02:2025, A03:2025, A08:2025 | PR.PS, GV.SC] - Dockerfile security, exposed ports, secrets in git, CI/CD injection, overly permissive IAM
+17. **AI/LLM Security** [A05:2025, A01:2025, A04:2025 | PR.DS, PR.AA] - Prompt injection (direct and indirect), PII sent to external AI APIs, AI output rendered without sanitization (XSS via LLM), tool/function calling without permission checks, RAG data poisoning, missing cost/abuse monitoring, API key leakage for AI services, fail-open when AI service is down
+18. **WebSocket Security** [A01:2025, A05:2025, A07:2025 | PR.AA, PR.DS] - Handshake auth, per-message authorization, cross-site WebSocket hijacking, broadcast isolation, message validation, connection exhaustion, backpressure
+19. **gRPC Security** [A01:2025, A05:2025, A02:2025 | PR.AA, PR.DS] - mTLS enforcement, per-RPC auth, metadata injection, message size limits, reflection disabled, streaming rate limits
+20. **Serverless and Cloud-Native** [A01:2025, A02:2025, A03:2025 | PR.PS, PR.AA] - Lambda/Functions execution role privilege, K8s RBAC and pod security, NetworkPolicies, IaC state security, admission controllers
 
 For dependency checks: `composer audit`, `npm audit`, `pip audit`, `bundle audit`, `govulncheck`, `dotnet list package --vulnerable`.
 For git secrets: `git log -p --all -S 'password' --since="1 year ago"`.

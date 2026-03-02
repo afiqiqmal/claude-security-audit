@@ -10,7 +10,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **CWE Mapping** - Every finding tagged with specific CWE IDs
 - **NIST CSF 2.0 Mapping** - Every finding maps to Govern, Identify, Protect, Detect, Respond or Recover
 - **Multi-Framework Compliance** - SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022
-- **White-Box Testing** - 18 attack categories with 850+ individual checks
+- **White-Box Testing** - 20 attack categories with 475+ individual checks
 - **AI/LLM Security** - Prompt injection, output sanitization, RAG poisoning, cost monitoring, tool calling permissions
 - **Diff Mode** - Scan only git-changed files for fast PR-level reviews
 - **Gray-Box Testing** - Role-based access probing, API endpoint testing, credential boundary checks, error differential analysis
@@ -33,7 +33,7 @@ claude-security-audit/
 │   └── commands/
 │       └── security-audit.md       # /security-audit slash command
 ├── references/
-│   ├── attack-vectors.md           # 850+ security checks (OWASP 2025 + NIST + CWE tagged)
+│   ├── attack-vectors.md           # 475+ security checks (OWASP 2025 + NIST + CWE tagged)
 │   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
 │   ├── compliance-mapping.md       # CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001
 │   ├── custom-template.md          # Template for custom checks
@@ -76,14 +76,22 @@ bash install.sh
 cp -r .claude/commands/security-audit.md /path/to/your-project/.claude/commands/
 ```
 
-When installed per-project, use `/project:security-audit`.
+When installed per-project, use `/project:security-audit`. Note: this copies only the command file. Reference files (`attack-vectors.md`, `compliance-mapping.md`, etc.) must be installed globally via `bash install.sh` for full and diff modes. Quick and lite modes work without references.
+
+### Uninstall
+
+```bash
+bash install.sh --uninstall
+```
+
+Removes the command file, reference files, custom checks folder and guidelines.
 
 ## What Gets Installed
 
 | File | Location | Purpose |
 |------|----------|---------|
 | `security-audit.md` | `~/.claude/commands/` | `/security-audit` slash command |
-| `attack-vectors.md` | `~/.claude/security-audit-references/` | 850+ OWASP 2025/NIST/CWE-tagged security checks |
+| `attack-vectors.md` | `~/.claude/security-audit-references/` | 475+ OWASP 2025/NIST/CWE-tagged security checks |
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
 | `compliance-mapping.md` | `~/.claude/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
 | `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 10 framework-specific checklists |
