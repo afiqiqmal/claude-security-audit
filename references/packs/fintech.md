@@ -2,6 +2,15 @@
 
 Security checks for financial services applications handling transactions, payment data and financial records. Load this pack with `--pack fintech`.
 
+### When to use this pack
+
+Running `/security-audit` without `--pack` already covers general security (OWASP Top 10, injection, auth, crypto, etc.). Packs are **optional add-ons** that layer domain-specific compliance checks on top of the standard audit. Use this pack when your application handles financial transactions, payment processing or regulated financial data and you need to verify fintech-specific requirements like PCI DSS controls, fraud detection, KYC/AML workflows and transaction integrity.
+
+```bash
+/security-audit --pack fintech
+/security-audit full --fix --pack fintech
+```
+
 ## Transaction Security [A01:2025, A05:2025 | PR.DS, PR.AA]
 
 - [ ] All financial transactions use database transactions with proper isolation levels (CWE-367)

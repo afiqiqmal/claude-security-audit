@@ -2,6 +2,15 @@
 
 Security checks for applications handling Protected Health Information (PHI). Load this pack with `--pack hipaa`.
 
+### When to use this pack
+
+Running `/security-audit` without `--pack` already covers general security (OWASP Top 10, injection, auth, crypto, etc.). Packs are **optional add-ons** that layer domain-specific compliance checks on top of the standard audit. Use this pack when your application stores, processes or transmits PHI and you need to verify HIPAA-specific requirements like PHI encryption, audit trails, BAA agreements and breach notification readiness.
+
+```bash
+/security-audit --pack hipaa
+/security-audit full --fix --pack hipaa
+```
+
 ## PHI Data Protection [A04:2025, A01:2025 | PR.DS, PR.AA]
 
 - [ ] PHI is encrypted at rest using AES-256 or equivalent (CWE-311)

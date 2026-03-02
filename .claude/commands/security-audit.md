@@ -80,6 +80,8 @@ Available packs:
 - `gdpr` - GDPR compliance checks for EU personal data
 - `fintech` - Financial services, transaction security and PCI DSS checks
 - `saas-multi-tenant` - Multi-tenant isolation, cross-tenant security and resource limits
+- `soc2` - SOC 2 Type II Trust Service Criteria, monitoring, change management and availability
+- `education` - FERPA/COPPA student data protection, parental consent and age verification
 
 Pack files are in `~/.claude/security-audit-references/packs/`. They follow the same format as custom checks.
 

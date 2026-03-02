@@ -17,7 +17,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Gray-Box Testing** - Role-based access probing, API endpoint testing, credential boundary checks, error differential analysis
 - **Security Hotspots** - Flags sensitive code that needs careful review during PRs
 - **Code Smells** - Quality patterns that breed security bugs
-- **Multi-Framework Detection** - Auto-detects and loads checks for up to 3 frameworks (Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go, Flask)
+- **Multi-Framework Detection** - Auto-detects and loads checks for up to 3 frameworks (Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go, Flask, Nuxt.js, SvelteKit)
 - **Findings First** - Shows findings by default, append `--fix` to include remediation code blocks
 - **Lite Mode** - Append `--lite` to reduce token usage (OWASP + CWE + NIST only, skips extra compliance mapping)
 - **CI Gating** - `--fail-on` flag outputs machine-readable PASS/FAIL for CI/CD pipelines
@@ -25,7 +25,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Baseline Suppression** - `--update-baseline` tracks known findings across audit runs
 - **Report Diff** - `--diff-report` compares with previous audits to show new, resolved and changed findings
 - **Triage Mode** - Interactive walkthrough to Accept, Defer, Dismiss or Escalate each finding
-- **Compliance Packs** - `--pack` loads HIPAA, GDPR, fintech or SaaS multi-tenant checks
+- **Compliance Packs** - `--pack` loads HIPAA, GDPR, fintech, SaaS multi-tenant, SOC 2 or Education checks
 - **Scope Exclusions** - `.security-audit-ignore` file to skip files and directories
 - **Custom Checks** - Add your own `.md` checklists globally or per-project
 - **Phase Control** - Run individual phases (recon, white-box, gray-box, hotspots, smells) independently
@@ -56,12 +56,16 @@ claude-security-audit/
 │   │   ├── spring-boot.md
 │   │   ├── aspnet-core.md
 │   │   ├── go.md
-│   │   └── flask.md
+│   │   ├── flask.md
+│   │   ├── nuxtjs.md
+│   │   └── sveltekit.md
 │   └── packs/                      # Compliance check packs
 │       ├── hipaa.md
 │       ├── gdpr.md
 │       ├── fintech.md
-│       └── saas-multi-tenant.md
+│       ├── saas-multi-tenant.md
+│       ├── soc2.md
+│       └── education.md
 ├── security-audit-guidelines.md    # Severity ratings, conventions, framework detection
 ├── install.sh                      # One-command installer
 ├── CLAUDE.md                       # Project context for Claude Code
@@ -109,8 +113,8 @@ Removes the command file, reference files, custom checks folder and guidelines.
 | `nist-csf-mapping.md` | `~/.claude/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
 | `compliance-mapping.md` | `~/.claude/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
 | `features-extended.md` | `~/.claude/security-audit-references/` | Baseline, SARIF/JSON, report diff and triage specs |
-| `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 10 framework-specific checklists |
-| `packs/*.md` | `~/.claude/security-audit-references/packs/` | 4 compliance check packs (HIPAA, GDPR, fintech, SaaS) |
+| `frameworks/*.md` | `~/.claude/security-audit-references/frameworks/` | 12 framework-specific checklists |
+| `packs/*.md` | `~/.claude/security-audit-references/packs/` | 6 compliance check packs (HIPAA, GDPR, fintech, SaaS, SOC 2, Education) |
 | `custom-template.md` | `~/.claude/security-audit-custom/` | Template for writing custom checks |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
 
@@ -179,6 +183,8 @@ Removes the command file, reference files, custom checks folder and guidelines.
 /security-audit --pack hipaa                    # HIPAA checks
 /security-audit --pack gdpr --pack fintech      # Multiple packs
 /security-audit --pack saas-multi-tenant
+/security-audit --pack soc2
+/security-audit --pack education
 
 # Combine everything
 /security-audit diff:main --lite --fix --fail-on high --pack hipaa
@@ -227,6 +233,7 @@ This audit is **token-intensive**. Claude reads the command file, reference file
 | `full` | ~29K tokens | ~40-120K | ~20-40K | **~90-190K tokens** |
 | `full --fix` | ~29K tokens | ~40-120K | ~30-60K | **~100-210K tokens** |
 | `full --pack hipaa` | ~31K tokens | ~40-120K | ~25-45K | **~95-195K tokens** |
+| `full --pack soc2` | ~31K tokens | ~40-120K | ~25-45K | **~95-195K tokens** |
 | `triage` | ~10K tokens | ~0K | ~5-10K | **~15-20K tokens** |
 
 **Reference overhead breakdown** (tokens loaded before scanning starts):
@@ -305,6 +312,8 @@ Load compliance-specific checklists with `--pack`:
 | `gdpr` | 38 | Consent, data subject rights, data protection by design, international transfers |
 | `fintech` | 40 | Transaction security, PCI DSS, fraud detection, KYC/AML, regulatory compliance |
 | `saas-multi-tenant` | 42 | Tenant isolation, cross-tenant vulnerabilities, resource limits, administration |
+| `soc2` | 50 | Trust Service Criteria (CC6-CC8), monitoring, change management, availability |
+| `education` | 35 | FERPA/COPPA student data, parental consent, directory info, age verification |
 
 ```bash
 /security-audit --pack hipaa                    # Single pack

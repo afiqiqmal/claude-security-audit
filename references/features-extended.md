@@ -16,7 +16,7 @@ The baseline file `.security-audit-baseline.json` stores fingerprints of known f
   "findings": [
     {
       "id": "CRITICAL-001",
-      "fingerprint": "a1b2c3d4",
+      "fingerprint": "a1b2c3d4e5f67890",
       "file": "src/auth/login.php",
       "cwe": "CWE-89",
       "owasp": "A05:2025",
@@ -34,7 +34,7 @@ Each finding fingerprint is a short hash derived from:
 - CWE ID
 - Finding title (normalized to lowercase, trimmed)
 
-Format: first 8 characters of SHA-256 hex digest of `{severity}:{file_path}:{cwe}:{normalized_title}`.
+Format: first 16 characters of SHA-256 hex digest of `{severity}:{file_path}:{cwe}:{normalized_title}`.
 
 ### Update Baseline Flow
 
@@ -132,6 +132,49 @@ Each finding becomes a SARIF result:
 | Impact | `result.message.text` |
 | CWE ID | `result.properties.cwe` |
 | NIST CSF | `result.properties.nist-csf` |
+
+### SARIF Fix Objects
+
+When `--fix` is set, each SARIF result includes a `fixes` array with replacement text mapped to SARIF `artifactChange` objects. This allows SARIF-compatible tools to offer one-click remediation.
+
+```json
+{
+  "ruleId": "A05-CWE-89",
+  "message": { "text": "SQL Injection in login query" },
+  "fixes": [
+    {
+      "description": { "text": "Use parameterized query" },
+      "artifactChanges": [
+        {
+          "artifactLocation": { "uri": "src/auth/login.php" },
+          "replacements": [
+            {
+              "deletedRegion": {
+                "startLine": 123,
+                "startColumn": 1,
+                "endLine": 125,
+                "endColumn": 1
+              },
+              "insertedContent": {
+                "text": "$stmt = $pdo->prepare('SELECT * FROM users WHERE email = ?');\n$stmt->execute([$email]);\n"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+| Fix Field | Source |
+|----------|--------|
+| `fixes[].description.text` | Remediation description from finding |
+| `artifactChanges[].artifactLocation.uri` | File path from finding location |
+| `replacements[].deletedRegion` | Line range of vulnerable code |
+| `replacements[].insertedContent.text` | Fixed code block content |
+
+Without `--fix`, the `fixes` array is omitted from results.
 
 ---
 
@@ -320,6 +363,45 @@ Save triage results to `./security-audit-triage.md`:
 - **Decision**: Escalate
 - **Reason**: Need architect input on error handling strategy
 ```
+
+### Triage Templates
+
+Pre-written reason templates for common triage decisions. Present these as suggestions when the developer chooses Defer, Dismiss or Escalate.
+
+**Defer templates:**
+- "Scheduled for remediation in [sprint/quarter]. Tracking in [ticket]."
+- "Risk accepted - compensating control in place ([describe control])."
+- "Low-traffic endpoint - fixing after higher-priority items."
+- "Dependency update pending upstream fix. Monitoring [advisory URL]."
+
+**Dismiss templates:**
+- "False positive - [variable/function] is internally controlled, never user input."
+- "Test/fixture code only - not deployed to production."
+- "Mitigated by [WAF rule / network policy / framework default]."
+- "Deprecated endpoint scheduled for removal in [version/date]."
+
+**Escalate templates:**
+- "Requires architectural decision on [topic]. Assigning to [team/person]."
+- "Cross-team dependency - needs coordination with [team]."
+- "Regulatory/compliance implication - needs legal/compliance review."
+- "Performance trade-off - needs benchmarking before applying fix."
+
+### Severity Override
+
+During triage, the developer may adjust a finding's severity. When overriding:
+1. Ask for the new severity level (CRITICAL, HIGH, MEDIUM, LOW, INFO)
+2. Ask for a one-line justification
+3. Record the override in the triage output:
+
+```markdown
+### 🟡 [MEDIUM-003] Missing CSRF token
+- **Decision**: Accept
+- **Severity override**: MEDIUM -> 🟢 LOW
+- **Override reason**: API-only endpoint behind VPN, no browser clients
+- **Action**: Fix in next sprint
+```
+
+Severity overrides appear in the triage file only. They do not modify the original audit report.
 
 ### Triage Integration
 

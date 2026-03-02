@@ -144,7 +144,7 @@ else
 fi
 
 # Install compliance pack files
-PACKS="hipaa gdpr fintech saas-multi-tenant"
+PACKS="hipaa gdpr fintech saas-multi-tenant soc2 education"
 PACK_FAILED=0
 PACK_INSTALLED=0
 
@@ -165,7 +165,7 @@ else
 fi
 
 # Install framework reference files
-FRAMEWORKS="laravel nextjs fastapi express django rails spring-boot aspnet-core go flask"
+FRAMEWORKS="laravel nextjs fastapi express django rails spring-boot aspnet-core go flask nuxtjs sveltekit"
 FRAMEWORK_FAILED=0
 FRAMEWORK_INSTALLED=0
 
@@ -261,7 +261,7 @@ echo "  --fail-on critical|high|medium   CI gating with PASS/FAIL exit line"
 echo "  --format sarif|json              Structured output (GitHub/custom)"
 echo "  --update-baseline                Save finding fingerprints for tracking"
 echo "  --diff-report ./prev-report.md   Compare with previous report"
-echo "  --pack hipaa|gdpr|fintech|saas-multi-tenant  Compliance packs"
+echo "  --pack hipaa|gdpr|fintech|saas-multi-tenant|soc2|education  Compliance packs"
 echo ""
 echo "Report will be saved to ./security-audit-report.md in your project root."
 echo ""

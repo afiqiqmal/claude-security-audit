@@ -98,7 +98,7 @@ See `~/.claude/security-audit-references/compliance-mapping.md` for the full cro
 | `--format FORMAT` | Generate structured output alongside markdown (sarif or json) |
 | `--update-baseline` | Write finding fingerprints to `.security-audit-baseline.json` for future comparison |
 | `--diff-report PATH` | Compare new report with a previous report and show changes |
-| `--pack NAME` | Load a compliance-specific check pack (hipaa, gdpr, fintech, saas-multi-tenant) |
+| `--pack NAME` | Load a compliance-specific check pack (hipaa, gdpr, fintech, saas-multi-tenant, soc2, education) |
 
 ### Scope Exclusions
 
@@ -112,6 +112,8 @@ Create a `.security-audit-ignore` file in the project root with gitignore-style 
 | `gdpr` | Consent, data subject rights, data protection by design, international transfers, breach management |
 | `fintech` | Transaction security, PCI DSS, fraud detection, regulatory compliance (KYC/AML) |
 | `saas-multi-tenant` | Tenant isolation, cross-tenant vulnerabilities, resource limits, tenant administration |
+| `soc2` | Trust Service Criteria (CC6-CC8), monitoring, change management, availability, vendor management |
+| `education` | FERPA/COPPA student data, parental consent, directory information, age verification |
 
 ## Report Conventions
 
@@ -138,6 +140,8 @@ Create a `.security-audit-ignore` file in the project root with gitignore-style 
 | `*.csproj` + `Program.cs` | ASP.NET Core | Anti-forgery, `FromSqlRaw`, Data Protection API, Kestrel config |
 | `go.mod` + `gin` or `echo` or `fiber` | Go (Gin/Echo/Fiber) | `text/template` vs `html/template`, `os/exec`, SQL string concat, panic recovery |
 | `requirements.txt` + `flask` | Flask | Jinja2 `\| safe`, `SECRET_KEY`, CSRF (Flask-WTF), debug mode, `pickle.loads()` |
+| `package.json` + `nuxt.config` | Nuxt.js | `runtimeConfig.public` secrets, server routes auth, auto-import leaks, Nitro engine, head injection |
+| `package.json` + `svelte.config` | SvelteKit | Server load functions, form actions, hooks auth, CSP config, `{@html}` sanitization, env handling |
 
 ## Guidelines Reference
 

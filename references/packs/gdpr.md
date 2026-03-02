@@ -2,6 +2,15 @@
 
 Security checks for applications processing personal data of EU/EEA residents. Load this pack with `--pack gdpr`.
 
+### When to use this pack
+
+Running `/security-audit` without `--pack` already covers general security (OWASP Top 10, injection, auth, crypto, etc.). Packs are **optional add-ons** that layer domain-specific compliance checks on top of the standard audit. Use this pack when your application collects or processes personal data of EU/EEA residents and you need to verify GDPR-specific requirements like lawful basis, data subject rights, consent management and cross-border transfer safeguards.
+
+```bash
+/security-audit --pack gdpr
+/security-audit full --fix --pack gdpr
+```
+
 ## Lawful Basis and Consent [A01:2025, A06:2025 | GV.PO, PR.AA]
 
 - [ ] Each data processing activity has a documented lawful basis (CWE-862)

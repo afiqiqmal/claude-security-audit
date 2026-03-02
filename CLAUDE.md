@@ -31,7 +31,7 @@ Claude Code slash command for white-box and gray-box security auditing. Maps fin
 - `--format sarif|json` - Structured output (SARIF v2.1.0 or JSON)
 - `--update-baseline` - Write finding fingerprints for future comparison
 - `--diff-report path` - Compare with previous report
-- `--pack name` - Load compliance packs (hipaa, gdpr, fintech, saas-multi-tenant)
+- `--pack name` - Load compliance packs (hipaa, gdpr, fintech, saas-multi-tenant, soc2, education)
 
 ## Structure
 
@@ -40,8 +40,8 @@ Claude Code slash command for white-box and gray-box security auditing. Maps fin
 - `references/nist-csf-mapping.md` - NIST CSF 2.0 mapping tables
 - `references/compliance-mapping.md` - CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 mapping
 - `references/custom-template.md` - Template for custom security checks
-- `references/frameworks/` - Framework-specific checklists (Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go, Flask)
+- `references/frameworks/` - Framework-specific checklists (Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go, Flask, Nuxt.js, SvelteKit)
 - `references/features-extended.md` - Baseline, SARIF/JSON, report diff and triage specs
-- `references/packs/` - Compliance packs (HIPAA, GDPR, fintech, SaaS multi-tenant)
+- `references/packs/` - Compliance packs (HIPAA, GDPR, fintech, SaaS multi-tenant, SOC 2, Education)
 - `security-audit-guidelines.md` - Severity ratings, modes and conventions
 - `install.sh` - Installs command and references to `~/.claude/`

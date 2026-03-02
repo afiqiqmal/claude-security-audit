@@ -2,6 +2,15 @@
 
 Security checks for multi-tenant SaaS applications. Load this pack with `--pack saas-multi-tenant`.
 
+### When to use this pack
+
+Running `/security-audit` without `--pack` already covers general security (OWASP Top 10, injection, auth, crypto, etc.). Packs are **optional add-ons** that layer domain-specific compliance checks on top of the standard audit. Use this pack when your application serves multiple tenants from a shared infrastructure and you need to verify multi-tenancy-specific requirements like tenant data isolation, cross-tenant access prevention, resource limits and tenant administration controls.
+
+```bash
+/security-audit --pack saas-multi-tenant
+/security-audit full --fix --pack saas-multi-tenant
+```
+
 ## Tenant Isolation [A01:2025 | PR.AA, PR.DS]
 
 - [ ] Every database query includes tenant scoping (WHERE tenant_id = ?) (CWE-863)
