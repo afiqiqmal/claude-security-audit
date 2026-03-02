@@ -134,6 +134,36 @@ By default, the report shows findings only (vulnerable code, impact and a text d
 
 Report saves to `./security-audit-report.md` in your project root.
 
+### Token Usage Warning
+
+This audit is **token-intensive**. Claude reads the command file, reference files and your entire codebase before generating a report. Estimated token usage by mode:
+
+| Mode | Reference Overhead | Codebase Scan | Report Output | Estimated Total |
+|------|-------------------|---------------|---------------|-----------------|
+| `quick --lite` | ~8K tokens | ~20-60K | ~5-15K | **~30-80K tokens** |
+| `diff --lite` | ~8K tokens | ~5-20K | ~5-15K | **~20-40K tokens** |
+| `quick` | ~18K tokens | ~20-60K | ~10-25K | **~50-100K tokens** |
+| `focus:auth` | ~14K tokens | ~15-40K | ~10-20K | **~40-75K tokens** |
+| `diff` | ~18K tokens | ~5-20K | ~10-20K | **~35-60K tokens** |
+| `full --lite` | ~18K tokens | ~40-120K | ~15-30K | **~75-170K tokens** |
+| `full` | ~28K tokens | ~40-120K | ~20-40K | **~90-190K tokens** |
+| `full --fix` | ~28K tokens | ~40-120K | ~30-60K | **~100-210K tokens** |
+
+**Reference overhead breakdown** (tokens loaded before scanning starts):
+
+| File | Tokens | Loaded In |
+|------|--------|-----------|
+| Command file (always loaded) | ~6K | All modes |
+| `attack-vectors.md` | ~10K | `full`, `diff`, `phase:2` (skipped in `quick`) |
+| `compliance-mapping.md` | ~7K | `full` only (skipped with `--lite`) |
+| `nist-csf-mapping.md` | ~3K | `full`, `phase:2` (skipped with `--lite`) |
+| `guidelines.md` | ~2K | All modes |
+| Framework file (1 of 10) | ~1K | When framework detected |
+
+Codebase scan tokens depend on your project size. A small project (10-20 files) uses ~20K scan tokens while a large project (200+ files) can use 100K+. The `diff` and `focus` modes significantly reduce scan tokens by limiting scope. Adding `--fix` increases report output by roughly 50% due to remediation code blocks.
+
+**To minimize costs**: use `quick --lite` for fast checks, `diff --lite` for PR reviews and reserve `full` for thorough audits.
+
 ## Custom Checks
 
 Add your own security checklists that run alongside the built-in checks. The audit reads all `.md` files from two folders:
