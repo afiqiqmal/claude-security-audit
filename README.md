@@ -1,6 +1,6 @@
 # Claude Security Audit
 
-A Claude Code slash command for running comprehensive white-box and gray-box security audits on your projects, with findings mapped to OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS/CWE Top 25, OWASP ASVS, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
+A Claude Code slash command for running comprehensive white-box and gray-box security audits on your projects, with findings mapped to OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS/CWE Top 25, OWASP ASVS 4.0, PCI DSS 4.0, MITRE ATT&CK, SOC 2 and ISO 27001:2022.
 
 ## Features
 
@@ -19,7 +19,8 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Framework Detection** - Tailored checks for Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go and Flask
 - **Findings First** - Shows findings by default, append `--fix` to include remediation code blocks
 - **Custom Checks** - Add your own `.md` checklists globally or per-project
-- **Multiple Modes** - Full audit, quick scan, gray-box only, or focused deep dives
+- **Phase Control** - Run individual phases (recon, white-box, gray-box, hotspots, smells) independently
+- **Multiple Modes** - Full audit, quick scan, gray-box only, focused deep dives or single phases
 
 ## What's Included
 
@@ -107,6 +108,13 @@ When installed per-project, use `/project:security-audit`.
 /security-audit focus:auth     # Authentication and authorization
 /security-audit focus:api      # API security and input validation
 /security-audit focus:config   # Configuration, supply chain, infrastructure
+
+# Run individual phases
+/security-audit phase:1        # Reconnaissance only
+/security-audit phase:2        # White-box analysis only
+/security-audit phase:3        # Gray-box testing only
+/security-audit phase:4        # Security hotspots only
+/security-audit phase:5        # Code smells only
 
 # Include code fixes in the report (off by default)
 /security-audit --fix          # Full audit with remediation code blocks

@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*)
 description: Run a comprehensive white-box and gray-box security audit with OWASP Top 10:2025, CWE, NIST CSF 2.0, SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping. Shows findings by default. Append --fix to include remediation code blocks.
-argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config] [--fix]"
+argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config|phase:1|phase:2|phase:3|phase:4|phase:5] [--fix]"
 ---
 
 # Security Audit Command
@@ -11,14 +11,21 @@ You are an expert application security engineer. Perform a white-box and gray-bo
 ## Mode Selection
 
 Based on `$ARGUMENTS`:
-- **full** (default if empty) - White-box + gray-box audit across all categories, hotspots and smells
-- **quick** - CRITICAL and HIGH severity issues only, skip hotspots, smells and gray-box
-- **gray** - Gray-box testing only (role-based access, API probing, credential boundaries)
-- **focus:auth** - Deep dive on authentication and authorization (includes hotspots for auth boundaries, skips gray-box and smells)
-- **focus:api** - Deep dive on API security, input validation and rate limiting (includes hotspots for input/output boundaries, skips gray-box and smells)
-- **focus:config** - Deep dive on configuration, supply chain and infrastructure (includes hotspots for config and third-party integrations, skips gray-box and smells)
-- **diff** - Scan only files changed since last commit (`git diff HEAD`), skip gray-box and smells
-- **diff:BRANCH** - Scan only files changed compared to a branch (e.g., `diff:main`), skip gray-box and smells
+- **full** (default if empty) - All phases: recon + white-box + gray-box + hotspots + smells (Phases 1-5)
+- **quick** - CRITICAL and HIGH severity issues only across all white-box categories, skip gray-box, hotspots and smells (Phases 1-2 only)
+- **gray** - Gray-box testing only: role-based access, API probing, credential boundaries, rate limits and error differentials (Phases 1 and 3 only)
+- **focus:auth** - Deep dive on authentication and authorization (Phase 1 + Phase 2 categories A01, A07 + Phase 4 auth hotspots only)
+- **focus:api** - Deep dive on API security, input validation and rate limiting (Phase 1 + Phase 2 categories A01, A05, A06 for APIs + Phase 4 input/output hotspots only)
+- **focus:config** - Deep dive on configuration, supply chain and infrastructure (Phase 1 + Phase 2 categories A02, A03, A08 + Phase 4 config hotspots only)
+- **diff** - Scan only files changed since last commit (`git diff HEAD`), skip gray-box and smells (Phases 0, 1, 2, 4)
+- **diff:BRANCH** - Scan only files changed compared to a branch (e.g., `diff:main`), skip gray-box and smells (Phases 0, 1, 2, 4)
+- **phase:1** - Reconnaissance only - map project structure, tech stack, entry points, data flow and custom checks
+- **phase:2** - White-box analysis only - run all 18 attack categories against the full codebase
+- **phase:3** - Gray-box testing only - role-based access, API probing, credential boundaries, rate limits, error differentials
+- **phase:4** - Security hotspots only - flag sensitive code areas that need careful review
+- **phase:5** - Code smells only - structural, data handling, error handling, dependency and design patterns
+
+Phase mode always runs Phase 1 (reconnaissance) first to gather context, then executes only the requested phase. The report includes only the sections relevant to the phase run.
 
 ### Fix Mode
 
@@ -180,7 +187,7 @@ For each gray-box finding, include:
 
 ### Phase 4: Security Hotspots [NIST: ID + GV | OWASP: A06:2025]
 
-(Skip in `quick` and `gray` modes)
+(Skip in `quick` and `gray` modes. Run in `full`, `diff`, `focus` and `phase:4` modes.)
 
 Flag sensitive code areas that are not vulnerable today but would break if modified carelessly:
 
@@ -198,7 +205,7 @@ Flag sensitive code areas that are not vulnerable today but would break if modif
 
 ### Phase 5: Code Smells [NIST: GV + PR | OWASP: A06:2025]
 
-(Skip in `quick` and `gray` modes)
+(Skip in `quick`, `gray`, `diff` and `focus` modes. Run in `full` and `phase:5` modes.)
 
 **Structural** [GV.RM | A06:2025]: God classes over 500 lines, duplicated security logic, missing abstractions, dead code with active routes
 **Data handling** [PR.DS | A01:2025, A05:2025]: Overly permissive models, raw JSON output, inconsistent validation
@@ -229,7 +236,7 @@ Save the report to `./security-audit-report.md` in the project root.
 **Date**: [today's date]
 **Auditor**: Claude Security Audit
 **Frameworks**: OWASP Top 10:2025 + NIST CSF 2.0
-**Mode**: [full/quick/gray/focus:X]
+**Mode**: [full/quick/gray/focus:X/diff/phase:X]
 
 ---
 
@@ -321,7 +328,9 @@ Save the report to `./security-audit-report.md` in the project root.
 ## Security Hotspots
 ### [HOTSPOT-001] Title
 - **OWASP**: [relevant]
+- **CWE**: [CWE-ID]
 - **NIST CSF**: [category]
+- **Compliance**: [applicable framework references]
 - **Location**: `path/to/file:45-120`
 - **Why sensitive**: [explanation]
 - **Risk if modified**: [what could go wrong]
@@ -330,7 +339,9 @@ Save the report to `./security-audit-report.md` in the project root.
 ## Code Smells
 ### [SMELL-001] Title
 - **OWASP**: [relevant, typically A06:2025]
+- **CWE**: [CWE-ID]
 - **NIST CSF**: [category]
+- **Compliance**: [applicable framework references]
 - **Location**: `path/to/file`
 - **Pattern**: [what was found]
 - **Security implication**: [why it matters]
@@ -341,8 +352,11 @@ Save the report to `./security-audit-report.md` in the project root.
 [prioritized action items grouped by OWASP category]
 
 ## Methodology
+- Phases executed: [list phases run, e.g., 1-5 for full, 1-2 for quick]
 - White-box: [categories checked]
 - Gray-box: [roles tested, endpoints probed]
+- Hotspots: [count and sensitivity categories scanned]
+- Code smells: [structural, data handling, error handling, dependencies, design]
 - OWASP Top 10:2025 coverage: [X/10 categories]
 - NIST CSF 2.0 coverage: [functions covered]
 - CWE coverage: [unique CWE IDs identified]

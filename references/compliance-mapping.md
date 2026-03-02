@@ -89,6 +89,8 @@ Each OWASP Top 10:2025 category maps to specific Common Weakness Enumeration (CW
 | CWE-116 | Improper Encoding or Escaping of Output | Missing output encoding |
 | CWE-917 | Expression Language Injection | SpEL, OGNL, EL injection |
 | CWE-643 | XPath Injection | User input in XPath queries |
+| CWE-80 | Improper Neutralization of Script-Related HTML Tags | Basic XSS via script tags |
+| CWE-83 | Improper Neutralization of Script in Attributes | XSS via event handler attributes |
 
 ### A06:2025 Insecure Design
 
@@ -104,6 +106,7 @@ Each OWASP Top 10:2025 category maps to specific Common Weakness Enumeration (CW
 | CWE-602 | Client-Side Enforcement of Server-Side Security | Validation only in frontend |
 | CWE-799 | Improper Control of Interaction Frequency | Missing rate limiting |
 | CWE-841 | Improper Enforcement of Behavioral Workflow | Skippable multi-step flows |
+| CWE-362 | Concurrent Execution Using Shared Resource with Improper Synchronization | Race conditions in business logic |
 
 ### A07:2025 Identification and Authentication Failures
 
@@ -191,7 +194,7 @@ The SANS/CWE Top 25 Most Dangerous Software Weaknesses, mapped to OWASP Top 10:2
 | 24 | CWE-400 | Uncontrolled Resource Consumption | A10:2025 |
 | 25 | CWE-306 | Missing Authentication for Critical Function | A07:2025 |
 
-**Coverage**: All 25 entries are checked by the security audit. 14 map to Injection/Access Control, 4 to Authentication, 3 to Access Control, 2 to Exceptional Conditions, 1 to Insecure Design, 1 to Data Integrity.
+**Coverage**: All 25 entries are checked by the security audit. 11 map to Injection (A05), 7 to Access Control (A01), 3 to Authentication (A07), 2 to Exceptional Conditions (A10), 1 to Insecure Design (A06) and 1 to Data Integrity (A08).
 
 ---
 
