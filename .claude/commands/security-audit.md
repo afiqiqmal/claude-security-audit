@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash(grep:*), Bash(find:*), Bash(cat:*), Bash(wc:*), Bash(head:*), Bash(tail:*), Bash(composer:*), Bash(npm:*), Bash(pip:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(curl:*)
-description: Run a comprehensive white-box and gray-box security audit on the current project with OWASP Top 10:2025 and NIST CSF 2.0 mapping, security hotspots, code smells and actionable remediation. Outputs report to project directory.
-argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config]"
+description: Run a comprehensive white-box and gray-box security audit on the current project with OWASP Top 10:2025 and NIST CSF 2.0 mapping, security hotspots and code smells. Shows findings by default. Append --fix to include remediation code blocks.
+argument-hint: "[full|quick|gray|diff|diff:branch|focus:auth|focus:api|focus:config] [--fix]"
 ---
 
 # Security Audit Command
@@ -19,6 +19,12 @@ Based on `$ARGUMENTS`:
 - **focus:config** - Deep dive on configuration, supply chain and infrastructure (includes hotspots for config and third-party integrations, skips gray-box and smells)
 - **diff** - Scan only files changed since last commit (`git diff HEAD`), skip gray-box and smells
 - **diff:BRANCH** - Scan only files changed compared to a branch (e.g., `diff:main`), skip gray-box and smells
+
+### Fix Mode
+
+Append `--fix` to any mode to include copy-paste-ready code fixes in the report. Without `--fix`, the report shows only findings (vulnerable code, location, impact) and no remediation code blocks.
+
+Examples: `/security-audit --fix`, `/security-audit quick --fix`, `/security-audit diff:main --fix`
 
 ## Framework Mapping
 
@@ -250,8 +256,8 @@ Save the report to `./security-audit-report.md` in the project root.
 - **Impact**: [consequences]
 - **Vulnerable Code**:
   [code block]
-- **Remediation**:
-  [fixed code block]
+- **Remediation**: [description of what to fix]
+  [include fixed code block ONLY if --fix flag is set]
 
 ## Medium Findings
 [same format]
@@ -270,8 +276,8 @@ Save the report to `./security-audit-report.md` in the project root.
 - **Expected**: [what should happen]
 - **Actual**: [what actually happens]
 - **Request**: [the exact request demonstrating the issue]
-- **Remediation**:
-  [fixed code block]
+- **Remediation**: [description of what to fix]
+  [include fixed code block ONLY if --fix flag is set]
 
 ## Security Hotspots
 ### [HOTSPOT-001] Title
@@ -289,8 +295,8 @@ Save the report to `./security-audit-report.md` in the project root.
 - **Location**: `path/to/file`
 - **Pattern**: [what was found]
 - **Security implication**: [why it matters]
-- **Refactoring**:
-  [code suggestion]
+- **Suggestion**: [description of what to refactor]
+  [include refactored code block ONLY if --fix flag is set]
 
 ## Recommendations Summary
 [prioritized action items grouped by OWASP category]
@@ -306,7 +312,7 @@ Save the report to `./security-audit-report.md` in the project root.
 
 1. Read every route, controller, model, middleware, config, migration and seeder
 2. Every finding must reference actual code with file path and line number
-3. Every finding must include a copy-paste-ready fix
+3. Every finding must show the vulnerable code snippet
 4. Every finding must have both OWASP Top 10:2025 and NIST CSF mapping
 5. Gray-box findings must include the role tested, endpoint, expected vs actual behavior
 6. If an area is clean, say so explicitly
@@ -314,8 +320,18 @@ Save the report to `./security-audit-report.md` in the project root.
 8. Critical and high findings go first
 9. Save report to `./security-audit-report.md` in the project root
 
-After saving the report, tell the developer:
+### Fix Mode Behavior
+
+- **Default (no `--fix`)**: Show findings with vulnerable code, location, attack vector and impact. Remediation is a short text description of what to fix (no code blocks). This keeps the report focused on understanding the issues.
+- **With `--fix`**: Include copy-paste-ready fixed code blocks in every finding's Remediation section. Also include refactored code in Code Smells.
+
+### After Saving the Report
+
+Tell the developer:
 - How many findings by severity
 - OWASP categories with issues
 - The top 3 most urgent items to fix
 - Where the full report is saved
+
+If `--fix` was NOT used, also tell the developer:
+> To generate the report again with code fixes included, run: `/security-audit [mode] --fix`

@@ -15,6 +15,7 @@ A Claude Code slash command for running comprehensive white-box and gray-box sec
 - **Security Hotspots** - Flags sensitive code that needs careful review during PRs
 - **Code Smells** - Quality patterns that breed security bugs
 - **Framework Detection** - Tailored checks for Laravel, Next.js, FastAPI, Express, Django, Rails, Spring Boot, ASP.NET Core, Go and Flask
+- **Findings First** - Shows findings by default, append `--fix` to include remediation code blocks
 - **Multiple Modes** - Full audit, quick scan, gray-box only, or focused deep dives
 
 ## What's Included
@@ -99,7 +100,14 @@ When installed per-project, use `/project:security-audit`.
 /security-audit focus:auth     # Authentication and authorization
 /security-audit focus:api      # API security and input validation
 /security-audit focus:config   # Configuration, supply chain, infrastructure
+
+# Include code fixes in the report (off by default)
+/security-audit --fix          # Full audit with remediation code blocks
+/security-audit quick --fix    # Quick scan with fixes
+/security-audit diff:main --fix
 ```
+
+By default, the report shows findings only (vulnerable code, impact and a text description of what to fix). Append `--fix` to include copy-paste-ready remediation code blocks.
 
 ### Output
 

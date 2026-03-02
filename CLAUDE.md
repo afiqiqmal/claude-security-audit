@@ -10,7 +10,8 @@ Claude Code slash command for white-box and gray-box security auditing with OWAS
 - No comma before "and" (no Oxford comma)
 - No AI jargon: avoid "leverage", "utilize", "cutting-edge"
 - Every finding must map to a NIST CSF 2.0 function and category
-- Every finding must include exact file path, line number and a working code fix
+- Every finding must include exact file path, line number and vulnerable code
+- Code fixes are only included when user passes `--fix` flag
 - Reports save to `./security-audit-report.md` in the project root (not global)
 
 ## Structure
