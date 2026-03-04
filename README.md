@@ -40,6 +40,11 @@ claude-security-audit/
 ├── .claude/
 │   └── commands/
 │       └── security-audit.md       # /security-audit slash command
+├── targets/
+│   ├── cursor/
+│   │   └── security-audit.mdc      # Cursor agent rule
+│   └── copilot/
+│       └── security-audit.prompt.md  # GitHub Copilot prompt file
 ├── references/
 │   ├── attack-vectors.md           # 475+ security checks (OWASP 2025 + NIST + CWE tagged)
 │   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
@@ -67,7 +72,7 @@ claude-security-audit/
 │       ├── soc2.md
 │       └── education.md
 ├── security-audit-guidelines.md    # Severity ratings, conventions, framework detection
-├── install.sh                      # One-command installer
+├── install.sh                      # One-command installer (supports --target cursor/copilot)
 ├── CLAUDE.md                       # Project context for Claude Code
 ├── LICENSE
 ├── .gitignore
@@ -76,21 +81,45 @@ claude-security-audit/
 
 ## Quick Install
 
-### One-Line Install
+### Claude Code (default)
 
 ```bash
+# One-line install
 curl -fsSL https://raw.githubusercontent.com/afiqiqmal/claude-security-audit/main/install.sh | bash
-```
 
-### Manual Install
-
-```bash
+# Or clone and install locally
 git clone https://github.com/afiqiqmal/claude-security-audit.git
 cd claude-security-audit
 bash install.sh
 ```
 
-### Per-Project Install (no global)
+Installs the `/security-audit` slash command and all reference files to `~/.claude/`.
+
+### Cursor
+
+```bash
+# From project root
+curl -fsSL https://raw.githubusercontent.com/afiqiqmal/claude-security-audit/main/install.sh | bash -s -- --target cursor
+
+# Or clone and install locally
+bash install.sh --target cursor
+```
+
+Installs a Cursor agent rule to `.cursor/rules/security-audit.mdc` and reference files to `.cursor/security-audit-references/`. Run from your project root.
+
+### GitHub Copilot
+
+```bash
+# From project root
+curl -fsSL https://raw.githubusercontent.com/afiqiqmal/claude-security-audit/main/install.sh | bash -s -- --target copilot
+
+# Or clone and install locally
+bash install.sh --target copilot
+```
+
+Installs a Copilot prompt file to `.github/prompts/security-audit.prompt.md` and reference files to `.github/prompts/security-audit-references/`. Run from your project root.
+
+### Per-Project Install (Claude Code, no global)
 
 ```bash
 cp -r .claude/commands/security-audit.md /path/to/your-project/.claude/commands/
@@ -101,12 +130,14 @@ When installed per-project, use `/project:security-audit`. Note: this copies onl
 ### Uninstall
 
 ```bash
-bash install.sh --uninstall
+bash install.sh --uninstall                    # Claude Code
+bash install.sh --uninstall --target cursor    # Cursor
+bash install.sh --uninstall --target copilot   # GitHub Copilot
 ```
 
-Removes the command file, reference files, custom checks folder and guidelines.
-
 ## What Gets Installed
+
+### Claude Code (`--target claude`, default)
 
 | File | Location | Purpose |
 |------|----------|---------|
@@ -120,7 +151,35 @@ Removes the command file, reference files, custom checks folder and guidelines.
 | `custom-template.md` | `~/.claude/security-audit-custom/` | Template for writing custom checks |
 | `security-audit-guidelines.md` | `~/.claude/` | Severity ratings and conventions |
 
+### Cursor (`--target cursor`)
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `security-audit.mdc` | `.cursor/rules/` | Cursor agent rule (auto-applied or via `@security-audit`) |
+| `attack-vectors.md` | `.cursor/security-audit-references/` | 475+ OWASP 2025/NIST/CWE-tagged security checks |
+| `nist-csf-mapping.md` | `.cursor/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
+| `compliance-mapping.md` | `.cursor/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
+| `features-extended.md` | `.cursor/security-audit-references/` | Baseline, SARIF/JSON, report diff and triage specs |
+| `frameworks/*.md` | `.cursor/security-audit-references/frameworks/` | 12 framework-specific checklists |
+| `packs/*.md` | `.cursor/security-audit-references/packs/` | 6 compliance check packs |
+| `custom-template.md` | `.cursor/security-audit-custom/` | Template for writing custom checks |
+
+### GitHub Copilot (`--target copilot`)
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `security-audit.prompt.md` | `.github/prompts/` | Copilot prompt file (select via paperclip icon in chat) |
+| `attack-vectors.md` | `.github/prompts/security-audit-references/` | 475+ OWASP 2025/NIST/CWE-tagged security checks |
+| `nist-csf-mapping.md` | `.github/prompts/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
+| `compliance-mapping.md` | `.github/prompts/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
+| `features-extended.md` | `.github/prompts/security-audit-references/` | Baseline, SARIF/JSON, report diff and triage specs |
+| `frameworks/*.md` | `.github/prompts/security-audit-references/frameworks/` | 12 framework-specific checklists |
+| `packs/*.md` | `.github/prompts/security-audit-references/packs/` | 6 compliance check packs |
+| `custom-template.md` | `.github/security-audit-custom/` | Template for writing custom checks |
+
 ## Usage
+
+### Claude Code
 
 ```bash
 # Full audit (white-box + gray-box + hotspots + smells)
@@ -193,6 +252,57 @@ Removes the command file, reference files, custom checks folder and guidelines.
 ```
 
 By default, the report shows findings only (vulnerable code, impact and a text description of what to fix). Append `--fix` to include copy-paste-ready remediation code blocks. Append `--lite` to skip SANS Top 25, ASVS, PCI DSS, MITRE ATT&CK, SOC 2 and ISO 27001 mapping and reduce token usage.
+
+### Cursor
+
+After installing with `--target cursor`, reference the rule in Cursor chat:
+
+```
+@security-audit run full audit
+@security-audit run quick audit
+@security-audit run diff audit
+@security-audit run diff:main audit
+@security-audit run focus:auth audit
+@security-audit run focus:api audit
+@security-audit run focus:config audit
+@security-audit recheck src/auth
+@security-audit triage
+
+# With flags
+@security-audit run full audit --fix
+@security-audit run quick audit --lite
+@security-audit run diff:main audit --fail-on high
+@security-audit run full audit --pack hipaa
+```
+
+The rule type is `agent-requested` - Cursor auto-applies it when the task is security-related, or you can reference it explicitly with `@security-audit`.
+
+### GitHub Copilot (VS Code)
+
+After installing with `--target copilot`, open Copilot Chat, click the paperclip icon, select **Prompt...** and pick `security-audit`. Prompt files require VS Code 1.99+.
+
+```
+Run a full security audit
+Run a quick security audit
+Run a diff security audit
+Run a diff:main security audit
+Run a focus:auth security audit
+Run a focus:api security audit
+Run a focus:config security audit
+Recheck src/auth security audit
+Run security audit triage
+
+# With flags
+Run a full security audit --fix
+Run a quick security audit --lite
+Run a diff:main security audit --fail-on high
+Run a full security audit --pack hipaa
+```
+
+To add extra prompt file locations, set in `settings.json`:
+```json
+"chat.promptFilesLocations": { "path/to/dir": true }
+```
 
 ### Output
 
