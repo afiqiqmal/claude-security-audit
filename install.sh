@@ -6,6 +6,8 @@
 # Usage (uninstall): bash install.sh --uninstall
 # Usage (cursor):    bash install.sh --target cursor
 # Usage (copilot):   bash install.sh --target copilot
+# Usage (windsurf):  bash install.sh --target windsurf
+# Usage (codex):     bash install.sh --target codex
 
 set -e
 
@@ -35,9 +37,9 @@ done
 
 # Validate target
 case "$TARGET" in
-    claude|cursor|copilot) ;;
+    claude|cursor|copilot|windsurf|codex) ;;
     *)
-        echo "Unknown target: $TARGET. Valid targets: claude, cursor, copilot"
+        echo "Unknown target: $TARGET. Valid targets: claude, cursor, copilot, windsurf, codex"
         exit 1
         ;;
 esac
@@ -83,6 +85,24 @@ if [ "$UNINSTALL" = true ]; then
                 fi
             done
             ;;
+        windsurf)
+            for target in ".windsurf/rules/security-audit.md" ".windsurf/security-audit-references" ".windsurf/security-audit-custom"; do
+                if [ -e "$target" ]; then
+                    rm -rf "$target"
+                    echo "  Removed $target"
+                    REMOVED=$((REMOVED + 1))
+                fi
+            done
+            ;;
+        codex)
+            for target in ".codex/security-audit.md" ".codex/security-audit-references" ".codex/security-audit-custom"; do
+                if [ -e "$target" ]; then
+                    rm -rf "$target"
+                    echo "  Removed $target"
+                    REMOVED=$((REMOVED + 1))
+                fi
+            done
+            ;;
     esac
 
     if [ $REMOVED -eq 0 ]; then
@@ -97,9 +117,11 @@ fi
 
 echo ""
 case "$TARGET" in
-    claude)  echo "Claude Security Audit Installer" ;;
-    cursor)  echo "Claude Security Audit Installer - Cursor" ;;
-    copilot) echo "Claude Security Audit Installer - GitHub Copilot" ;;
+    claude)   echo "Claude Security Audit Installer" ;;
+    cursor)   echo "Claude Security Audit Installer - Cursor" ;;
+    copilot)  echo "Claude Security Audit Installer - GitHub Copilot" ;;
+    windsurf) echo "Claude Security Audit Installer - Windsurf" ;;
+    codex)    echo "Claude Security Audit Installer - OpenAI Codex" ;;
 esac
 echo "================================"
 echo ""
@@ -610,6 +632,292 @@ if [ "$TARGET" = "copilot" ]; then
     echo "  Append --fix to include remediation code blocks:"
     echo "  Run a full security audit --fix"
     echo "  Run a quick security audit --fix"
+    echo ""
+    echo "  Additional flags:"
+    echo "  --lite           OWASP + CWE + NIST only (reduces token usage)"
+    echo "  --fail-on high   CI gating with PASS/FAIL exit line"
+    echo "  --format sarif   SARIF v2.1.0 output for GitHub Advanced Security"
+    echo "  --pack hipaa     Load HIPAA compliance checklist"
+    echo ""
+    echo "Report will be saved to ./security-audit-report.md in your project root."
+    echo ""
+    echo -e "${GREEN}You're all set!${NC}"
+    echo ""
+
+fi
+
+# ─────────────────────────────────────────────
+#  Target: windsurf
+# ─────────────────────────────────────────────
+if [ "$TARGET" = "windsurf" ]; then
+
+    RULES_DIR=".windsurf/rules"
+    REFERENCES_DIR=".windsurf/security-audit-references"
+    CUSTOM_DIR=".windsurf/security-audit-custom"
+
+    for dir in "$RULES_DIR" "$REFERENCES_DIR"; do
+        if [ ! -d "$dir" ]; then
+            echo -e "${YELLOW}Creating $dir${NC}"
+            mkdir -p "$dir"
+        fi
+    done
+
+    # Install Windsurf rule
+    if install_file "targets/windsurf/security-audit.md" "$RULES_DIR/security-audit.md"; then
+        echo -e "  ${GREEN}✓${NC} security-audit Windsurf rule"
+        INSTALLED=$((INSTALLED + 1))
+    else
+        echo -e "  ${RED}✗${NC} security-audit Windsurf rule"
+        FAILED=$((FAILED + 1))
+    fi
+
+    # Install reference files
+    for ref in attack-vectors nist-csf-mapping compliance-mapping features-extended; do
+        if install_file "references/${ref}.md" "$REFERENCES_DIR/${ref}.md"; then
+            echo -e "  ${GREEN}✓${NC} ${ref}.md reference"
+            INSTALLED=$((INSTALLED + 1))
+        else
+            echo -e "  ${RED}✗${NC} ${ref}.md reference"
+            FAILED=$((FAILED + 1))
+        fi
+    done
+
+    # Install compliance packs
+    PACKS="hipaa gdpr fintech saas-multi-tenant soc2 education"
+    PACK_FAILED=0
+    PACK_INSTALLED=0
+
+    for pack in $PACKS; do
+        if install_file "references/packs/${pack}.md" "$REFERENCES_DIR/packs/${pack}.md"; then
+            PACK_INSTALLED=$((PACK_INSTALLED + 1))
+        else
+            PACK_FAILED=$((PACK_FAILED + 1))
+        fi
+    done
+
+    if [ $PACK_FAILED -eq 0 ]; then
+        echo -e "  ${GREEN}✓${NC} compliance packs (${PACK_INSTALLED} packs)"
+        INSTALLED=$((INSTALLED + 1))
+    else
+        echo -e "  ${YELLOW}~${NC} compliance packs (${PACK_INSTALLED}/$((PACK_INSTALLED + PACK_FAILED)))"
+        INSTALLED=$((INSTALLED + 1))
+    fi
+
+    # Install framework references
+    FRAMEWORKS="laravel nextjs fastapi express django rails spring-boot aspnet-core go flask nuxtjs sveltekit"
+    FRAMEWORK_FAILED=0
+    FRAMEWORK_INSTALLED=0
+
+    for fw in $FRAMEWORKS; do
+        if install_file "references/frameworks/${fw}.md" "$REFERENCES_DIR/frameworks/${fw}.md"; then
+            FRAMEWORK_INSTALLED=$((FRAMEWORK_INSTALLED + 1))
+        else
+            FRAMEWORK_FAILED=$((FRAMEWORK_FAILED + 1))
+        fi
+    done
+
+    if [ $FRAMEWORK_FAILED -eq 0 ]; then
+        echo -e "  ${GREEN}✓${NC} framework references (${FRAMEWORK_INSTALLED} frameworks)"
+        INSTALLED=$((INSTALLED + 1))
+    else
+        echo -e "  ${YELLOW}~${NC} framework references (${FRAMEWORK_INSTALLED}/$((FRAMEWORK_INSTALLED + FRAMEWORK_FAILED)))"
+        INSTALLED=$((INSTALLED + 1))
+    fi
+
+    # Create custom checks directory and install template
+    if [ ! -d "$CUSTOM_DIR" ]; then
+        mkdir -p "$CUSTOM_DIR"
+    fi
+    if [ ! -f "$CUSTOM_DIR/custom-template.md" ]; then
+        if install_file "references/custom-template.md" "$CUSTOM_DIR/custom-template.md"; then
+            echo -e "  ${GREEN}✓${NC} custom checks folder + template"
+            INSTALLED=$((INSTALLED + 1))
+        else
+            echo -e "  ${YELLOW}~${NC} custom checks folder created (template skipped)"
+            INSTALLED=$((INSTALLED + 1))
+        fi
+    else
+        echo -e "  ${GREEN}✓${NC} custom checks folder (already exists)"
+        INSTALLED=$((INSTALLED + 1))
+    fi
+
+    echo ""
+
+    if [ $FAILED -eq 0 ]; then
+        echo -e "${GREEN}All $INSTALLED files installed successfully!${NC}"
+    else
+        echo -e "${YELLOW}Installed $INSTALLED files ($FAILED failed)${NC}"
+    fi
+
+    echo ""
+    echo -e "Installed to:"
+    echo -e "  Rule:       ${BLUE}$RULES_DIR/security-audit.md${NC}"
+    echo -e "  References: ${BLUE}$REFERENCES_DIR/${NC}"
+    echo -e "  Packs:      ${BLUE}$REFERENCES_DIR/packs/${NC}"
+    echo -e "  Custom:     ${BLUE}$CUSTOM_DIR/${NC}"
+    echo ""
+    echo "Usage in Windsurf:"
+    echo ""
+    echo "  The rule has 'manual' trigger: reference it with @security-audit in Cascade chat."
+    echo ""
+    echo "  @security-audit run full audit"
+    echo "  @security-audit run quick audit"
+    echo "  @security-audit run diff audit"
+    echo "  @security-audit run diff:main audit"
+    echo "  @security-audit run focus:auth audit"
+    echo "  @security-audit run focus:api audit"
+    echo "  @security-audit run focus:config audit"
+    echo "  @security-audit recheck src/auth"
+    echo "  @security-audit triage"
+    echo ""
+    echo "  Append --fix to include remediation code blocks:"
+    echo "  @security-audit run full audit --fix"
+    echo "  @security-audit run quick audit --fix"
+    echo ""
+    echo "  Additional flags:"
+    echo "  --lite           OWASP + CWE + NIST only (reduces token usage)"
+    echo "  --fail-on high   CI gating with PASS/FAIL exit line"
+    echo "  --format sarif   SARIF v2.1.0 output for GitHub Advanced Security"
+    echo "  --pack hipaa     Load HIPAA compliance checklist"
+    echo ""
+    echo "Report will be saved to ./security-audit-report.md in your project root."
+    echo ""
+    echo -e "${GREEN}You're all set!${NC}"
+    echo ""
+
+fi
+
+# ─────────────────────────────────────────────
+#  Target: codex
+# ─────────────────────────────────────────────
+if [ "$TARGET" = "codex" ]; then
+
+    CODEX_DIR=".codex"
+    REFERENCES_DIR=".codex/security-audit-references"
+    CUSTOM_DIR=".codex/security-audit-custom"
+
+    for dir in "$CODEX_DIR" "$REFERENCES_DIR"; do
+        if [ ! -d "$dir" ]; then
+            echo -e "${YELLOW}Creating $dir${NC}"
+            mkdir -p "$dir"
+        fi
+    done
+
+    # Install Codex instructions file
+    if install_file "targets/codex/security-audit.md" "$CODEX_DIR/security-audit.md"; then
+        echo -e "  ${GREEN}✓${NC} security-audit Codex instructions"
+        INSTALLED=$((INSTALLED + 1))
+    else
+        echo -e "  ${RED}✗${NC} security-audit Codex instructions"
+        FAILED=$((FAILED + 1))
+    fi
+
+    # Install reference files
+    for ref in attack-vectors nist-csf-mapping compliance-mapping features-extended; do
+        if install_file "references/${ref}.md" "$REFERENCES_DIR/${ref}.md"; then
+            echo -e "  ${GREEN}✓${NC} ${ref}.md reference"
+            INSTALLED=$((INSTALLED + 1))
+        else
+            echo -e "  ${RED}✗${NC} ${ref}.md reference"
+            FAILED=$((FAILED + 1))
+        fi
+    done
+
+    # Install compliance packs
+    PACKS="hipaa gdpr fintech saas-multi-tenant soc2 education"
+    PACK_FAILED=0
+    PACK_INSTALLED=0
+
+    for pack in $PACKS; do
+        if install_file "references/packs/${pack}.md" "$REFERENCES_DIR/packs/${pack}.md"; then
+            PACK_INSTALLED=$((PACK_INSTALLED + 1))
+        else
+            PACK_FAILED=$((PACK_FAILED + 1))
+        fi
+    done
+
+    if [ $PACK_FAILED -eq 0 ]; then
+        echo -e "  ${GREEN}✓${NC} compliance packs (${PACK_INSTALLED} packs)"
+        INSTALLED=$((INSTALLED + 1))
+    else
+        echo -e "  ${YELLOW}~${NC} compliance packs (${PACK_INSTALLED}/$((PACK_INSTALLED + PACK_FAILED)))"
+        INSTALLED=$((INSTALLED + 1))
+    fi
+
+    # Install framework references
+    FRAMEWORKS="laravel nextjs fastapi express django rails spring-boot aspnet-core go flask nuxtjs sveltekit"
+    FRAMEWORK_FAILED=0
+    FRAMEWORK_INSTALLED=0
+
+    for fw in $FRAMEWORKS; do
+        if install_file "references/frameworks/${fw}.md" "$REFERENCES_DIR/frameworks/${fw}.md"; then
+            FRAMEWORK_INSTALLED=$((FRAMEWORK_INSTALLED + 1))
+        else
+            FRAMEWORK_FAILED=$((FRAMEWORK_FAILED + 1))
+        fi
+    done
+
+    if [ $FRAMEWORK_FAILED -eq 0 ]; then
+        echo -e "  ${GREEN}✓${NC} framework references (${FRAMEWORK_INSTALLED} frameworks)"
+        INSTALLED=$((INSTALLED + 1))
+    else
+        echo -e "  ${YELLOW}~${NC} framework references (${FRAMEWORK_INSTALLED}/$((FRAMEWORK_INSTALLED + FRAMEWORK_FAILED)))"
+        INSTALLED=$((INSTALLED + 1))
+    fi
+
+    # Create custom checks directory and install template
+    if [ ! -d "$CUSTOM_DIR" ]; then
+        mkdir -p "$CUSTOM_DIR"
+    fi
+    if [ ! -f "$CUSTOM_DIR/custom-template.md" ]; then
+        if install_file "references/custom-template.md" "$CUSTOM_DIR/custom-template.md"; then
+            echo -e "  ${GREEN}✓${NC} custom checks folder + template"
+            INSTALLED=$((INSTALLED + 1))
+        else
+            echo -e "  ${YELLOW}~${NC} custom checks folder created (template skipped)"
+            INSTALLED=$((INSTALLED + 1))
+        fi
+    else
+        echo -e "  ${GREEN}✓${NC} custom checks folder (already exists)"
+        INSTALLED=$((INSTALLED + 1))
+    fi
+
+    echo ""
+
+    if [ $FAILED -eq 0 ]; then
+        echo -e "${GREEN}All $INSTALLED files installed successfully!${NC}"
+    else
+        echo -e "${YELLOW}Installed $INSTALLED files ($FAILED failed)${NC}"
+    fi
+
+    echo ""
+    echo -e "Installed to:"
+    echo -e "  Instructions: ${BLUE}$CODEX_DIR/security-audit.md${NC}"
+    echo -e "  References:   ${BLUE}$REFERENCES_DIR/${NC}"
+    echo -e "  Packs:        ${BLUE}$REFERENCES_DIR/packs/${NC}"
+    echo -e "  Custom:       ${BLUE}$CUSTOM_DIR/${NC}"
+    echo ""
+    echo "Usage with OpenAI Codex CLI:"
+    echo ""
+    echo "  Pass the instructions file as context when running codex:"
+    echo ""
+    echo "  codex --context .codex/security-audit.md 'run full audit'"
+    echo "  codex --context .codex/security-audit.md 'run quick audit'"
+    echo "  codex --context .codex/security-audit.md 'run diff audit'"
+    echo "  codex --context .codex/security-audit.md 'run diff:main audit'"
+    echo "  codex --context .codex/security-audit.md 'run focus:auth audit'"
+    echo "  codex --context .codex/security-audit.md 'run focus:api audit'"
+    echo "  codex --context .codex/security-audit.md 'run focus:config audit'"
+    echo "  codex --context .codex/security-audit.md 'recheck src/auth'"
+    echo "  codex --context .codex/security-audit.md 'triage'"
+    echo ""
+    echo "  Or add to your project AGENTS.md to load automatically:"
+    echo "  echo '' >> AGENTS.md"
+    echo "  echo '## Security Audit' >> AGENTS.md"
+    echo "  echo 'See .codex/security-audit.md for security audit instructions.' >> AGENTS.md"
+    echo ""
+    echo "  Append --fix to include remediation code blocks:"
+    echo "  codex --context .codex/security-audit.md 'run full audit --fix'"
     echo ""
     echo "  Additional flags:"
     echo "  --lite           OWASP + CWE + NIST only (reduces token usage)"

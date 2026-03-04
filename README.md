@@ -43,8 +43,12 @@ claude-security-audit/
 ├── targets/
 │   ├── cursor/
 │   │   └── security-audit.mdc      # Cursor agent rule
-│   └── copilot/
-│       └── security-audit.prompt.md  # GitHub Copilot prompt file
+│   ├── copilot/
+│   │   └── security-audit.prompt.md  # GitHub Copilot prompt file
+│   ├── windsurf/
+│   │   └── security-audit.md       # Windsurf Cascade rule
+│   └── codex/
+│       └── security-audit.md       # OpenAI Codex instructions
 ├── references/
 │   ├── attack-vectors.md           # 475+ security checks (OWASP 2025 + NIST + CWE tagged)
 │   ├── nist-csf-mapping.md         # OWASP 2025-to-NIST cross-reference tables
@@ -119,6 +123,30 @@ bash install.sh --target copilot
 
 Installs a Copilot prompt file to `.github/prompts/security-audit.prompt.md` and reference files to `.github/prompts/security-audit-references/`. Run from your project root.
 
+### Windsurf
+
+```bash
+# From project root
+curl -fsSL https://raw.githubusercontent.com/afiqiqmal/claude-security-audit/main/install.sh | bash -s -- --target windsurf
+
+# Or clone and install locally
+bash install.sh --target windsurf
+```
+
+Installs a Windsurf Cascade rule to `.windsurf/rules/security-audit.md` and reference files to `.windsurf/security-audit-references/`. Run from your project root.
+
+### OpenAI Codex
+
+```bash
+# From project root
+curl -fsSL https://raw.githubusercontent.com/afiqiqmal/claude-security-audit/main/install.sh | bash -s -- --target codex
+
+# Or clone and install locally
+bash install.sh --target codex
+```
+
+Installs instructions to `.codex/security-audit.md` and reference files to `.codex/security-audit-references/`. Run from your project root.
+
 ### Per-Project Install (Claude Code, no global)
 
 ```bash
@@ -130,9 +158,11 @@ When installed per-project, use `/project:security-audit`. Note: this copies onl
 ### Uninstall
 
 ```bash
-bash install.sh --uninstall                    # Claude Code
-bash install.sh --uninstall --target cursor    # Cursor
-bash install.sh --uninstall --target copilot   # GitHub Copilot
+bash install.sh --uninstall                      # Claude Code
+bash install.sh --uninstall --target cursor      # Cursor
+bash install.sh --uninstall --target copilot     # GitHub Copilot
+bash install.sh --uninstall --target windsurf    # Windsurf
+bash install.sh --uninstall --target codex       # OpenAI Codex
 ```
 
 ## What Gets Installed
@@ -176,6 +206,32 @@ bash install.sh --uninstall --target copilot   # GitHub Copilot
 | `frameworks/*.md` | `.github/prompts/security-audit-references/frameworks/` | 12 framework-specific checklists |
 | `packs/*.md` | `.github/prompts/security-audit-references/packs/` | 6 compliance check packs |
 | `custom-template.md` | `.github/security-audit-custom/` | Template for writing custom checks |
+
+### Windsurf (`--target windsurf`)
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `security-audit.md` | `.windsurf/rules/` | Windsurf Cascade rule (manual trigger via `@security-audit`) |
+| `attack-vectors.md` | `.windsurf/security-audit-references/` | 475+ OWASP 2025/NIST/CWE-tagged security checks |
+| `nist-csf-mapping.md` | `.windsurf/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
+| `compliance-mapping.md` | `.windsurf/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
+| `features-extended.md` | `.windsurf/security-audit-references/` | Baseline, SARIF/JSON, report diff and triage specs |
+| `frameworks/*.md` | `.windsurf/security-audit-references/frameworks/` | 12 framework-specific checklists |
+| `packs/*.md` | `.windsurf/security-audit-references/packs/` | 6 compliance check packs |
+| `custom-template.md` | `.windsurf/security-audit-custom/` | Template for writing custom checks |
+
+### OpenAI Codex (`--target codex`)
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `security-audit.md` | `.codex/` | Audit instructions (pass via `--context` or reference in `AGENTS.md`) |
+| `attack-vectors.md` | `.codex/security-audit-references/` | 475+ OWASP 2025/NIST/CWE-tagged security checks |
+| `nist-csf-mapping.md` | `.codex/security-audit-references/` | OWASP 2025-to-NIST cross-reference tables |
+| `compliance-mapping.md` | `.codex/security-audit-references/` | CWE, SANS Top 25, ASVS, PCI DSS, ATT&CK, SOC 2, ISO 27001 |
+| `features-extended.md` | `.codex/security-audit-references/` | Baseline, SARIF/JSON, report diff and triage specs |
+| `frameworks/*.md` | `.codex/security-audit-references/frameworks/` | 12 framework-specific checklists |
+| `packs/*.md` | `.codex/security-audit-references/packs/` | 6 compliance check packs |
+| `custom-template.md` | `.codex/security-audit-custom/` | Template for writing custom checks |
 
 ## Usage
 
@@ -302,6 +358,60 @@ Run a full security audit --pack hipaa
 To add extra prompt file locations, set in `settings.json`:
 ```json
 "chat.promptFilesLocations": { "path/to/dir": true }
+```
+
+### Windsurf
+
+After installing with `--target windsurf`, reference the rule in Cascade chat:
+
+```
+@security-audit run full audit
+@security-audit run quick audit
+@security-audit run diff audit
+@security-audit run diff:main audit
+@security-audit run focus:auth audit
+@security-audit run focus:api audit
+@security-audit run focus:config audit
+@security-audit recheck src/auth
+@security-audit triage
+
+# With flags
+@security-audit run full audit --fix
+@security-audit run quick audit --lite
+@security-audit run diff:main audit --fail-on high
+@security-audit run full audit --pack hipaa
+```
+
+The rule uses `trigger: manual` - it is only applied when you explicitly reference it with `@security-audit` in Cascade.
+
+### OpenAI Codex
+
+After installing with `--target codex`, pass the instructions file as context:
+
+```bash
+codex --context .codex/security-audit.md 'run full audit'
+codex --context .codex/security-audit.md 'run quick audit'
+codex --context .codex/security-audit.md 'run diff audit'
+codex --context .codex/security-audit.md 'run diff:main audit'
+codex --context .codex/security-audit.md 'run focus:auth audit'
+codex --context .codex/security-audit.md 'run focus:api audit'
+codex --context .codex/security-audit.md 'run focus:config audit'
+codex --context .codex/security-audit.md 'recheck src/auth'
+codex --context .codex/security-audit.md 'triage'
+
+# With flags
+codex --context .codex/security-audit.md 'run full audit --fix'
+codex --context .codex/security-audit.md 'run quick audit --lite'
+codex --context .codex/security-audit.md 'run diff:main audit --fail-on high'
+codex --context .codex/security-audit.md 'run full audit --pack hipaa'
+```
+
+Or add a reference to your project `AGENTS.md` so it loads automatically:
+
+```markdown
+## Security Audit
+
+See .codex/security-audit.md for security audit instructions.
 ```
 
 ### Output
